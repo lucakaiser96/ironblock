@@ -2,7 +2,7 @@
   "name": "Ironblock",
   "short_name": "Ironblock",
   "description": "Hypertrophie-Tracker · Lift. Log. Grow.",
-  "start_url": "/",
+  "start_url": "/ironblock/",
   "display": "standalone",
   "background_color": "#ffffff",
   "theme_color": "#ffffff",
