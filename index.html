@@ -3602,6 +3602,320 @@ with check (true);`}</pre>
 
     // ACTIVITY VIEW — Joggen & Tennis
     // ========================================================================
+
+    // ========================================================================
+    // SETTINGS VIEW
+    // ========================================================================
+    const SettingsView = ({ state, persist, setView, syncConfig, updateSyncConfig, syncStatus, notifPermission, setNotifPermission }) => {
+      const [confirmReset, setConfirmReset] = useState(false);
+      const [editorKey, setEditorKey] = useState(null);
+      const [planCreatorKey, setPlanCreator] = useState(null); // '__new__' or existing user plan key
+
+      const setPlan = (planKey) => persist({ ...state, profile: { ...state.profile, plan: planKey, sessionIndex: 0 } });
+      const setRest = (s) => persist({ ...state, profile: { ...state.profile, restSeconds: s } });
+      const doReset = () => {
+        const fresh = { ...DEFAULT_STATE, stats: { ...DEFAULT_STATE.stats, weekStart: getWeekStart() } };
+        persist(fresh, true); setConfirmReset(false); setView('dashboard');
+      };
+
+      const saveTemplateOverride = (key, exercises) => {
+        const base = TEMPLATES[key];
+        const nextCustom = { ...(state.customTemplates || {}) };
+        // If exercises identical to base, drop the override
+        const sameAsBase = JSON.stringify(exercises) === JSON.stringify(base.exercises);
+        if (sameAsBase) {
+          delete nextCustom[key];
+        } else {
+          nextCustom[key] = { name: base.name, code: base.code, exercises };
+        }
+        persist({ ...state, customTemplates: nextCustom });
+      };
+
+      const resetTemplate = (key) => {
+        const nextCustom = { ...(state.customTemplates || {}) };
+        delete nextCustom[key];
+        persist({ ...state, customTemplates: nextCustom });
+      };
+
+      const exportData = () => {
+        const data = JSON.stringify(state, null, 2);
+        const blob = new Blob([data], { type: 'application/json' });
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url; a.download = `ironblock-backup-${new Date().toISOString().slice(0,10)}.json`;
+        document.body.appendChild(a); a.click(); document.body.removeChild(a);
+        URL.revokeObjectURL(url);
+      };
+
+      return (
+        <div className="min-h-screen pb-28 relative grain">
+          <div className="px-5 pt-6 pb-2 flex items-center gap-3">
+            <button onClick={() => setView('dashboard')} className="text-gray-500 hover:text-gray-900">
+              <Icon.ChevronLeft size={28} />
+            </button>
+            <div>
+              <div className="text-xs uppercase tracking-[0.3em] text-gray-500">Setup</div>
+              <div className="font-display text-4xl text-gray-900">EINSTELLUNGEN</div>
+            </div>
+          </div>
+
+          <div className="px-5 mt-4 space-y-5">
+            <Section title="Trainingsplan">
+              <div className="space-y-2">
+                {/* Standard plans */}
+                <div className="text-[10px] uppercase tracking-wider text-gray-400 px-1 mb-1">Standard</div>
+                {Object.entries(PLAN_DEFS).map(([key, def]) => {
+                  const active = state.profile.plan === key;
+                  return (
+                    <button key={key} onClick={() => setPlan(key)}
+                      className={`w-full text-left p-4 rounded-2xl border transition ${active ? 'bg-emerald-100 border-emerald-400 text-emerald-900' : 'bg-gray-50 border-gray-200 text-gray-800'}`}>
+                      <div className="flex items-center justify-between">
+                        <div className="font-semibold">{def.label}</div>
+                        {active && <Icon.Check size={20} strokeWidth={3} />}
+                      </div>
+                      <div className={`text-xs mt-0.5 ${active ? 'text-emerald-900/70' : 'text-gray-500'}`}>{def.desc}</div>
+                    </button>
+                  );
+                })}
+                {/* User plans */}
+                {Object.keys(state.userPlans || {}).length > 0 && (
+                  <>
+                    <div className="text-[10px] uppercase tracking-wider text-gray-400 px-1 mt-3 mb-1">Eigene Pläne</div>
+                    {Object.entries(state.userPlans || {}).map(([key, def]) => {
+                      const active = state.profile.plan === key;
+                      return (
+                        <div key={key} className={`flex items-center gap-2 rounded-2xl border ${active ? 'bg-emerald-100 border-emerald-400' : 'bg-gray-50 border-gray-200'}`}>
+                          <button onClick={() => setPlan(key)} className="flex-1 text-left p-4">
+                            <div className="flex items-center justify-between">
+                              <div className={`font-semibold ${active ? 'text-emerald-900' : 'text-gray-800'}`}>{def.label}</div>
+                              {active && <Icon.Check size={18} strokeWidth={3} className="text-emerald-700" />}
+                            </div>
+                            <div className={`text-xs mt-0.5 ${active ? 'text-emerald-900/70' : 'text-gray-500'}`}>{def.daysPerWeek}× pro Woche · {def.days.length} Workout-{def.days.length === 1 ? 'Tag' : 'Tage'}</div>
+                          </button>
+                          <button onClick={() => setPlanCreator(key)} className="pr-4 text-gray-400 hover:text-emerald-700">
+                            <Icon.Edit3 size={16} />
+                          </button>
+                        </div>
+                      );
+                    })}
+                  </>
+                )}
+                {/* Create new plan */}
+                <button onClick={() => setPlanCreator('__new__')} className="w-full p-3 rounded-2xl border-2 border-dashed border-gray-300 text-gray-500 hover:border-emerald-400 hover:text-emerald-700 flex items-center justify-center gap-2 text-sm font-medium transition mt-1">
+                  <Icon.Plus size={16} strokeWidth={3} /> Eigenen Plan erstellen
+                </button>
+              </div>
+            </Section>
+
+            <Section title="Pausenzeit zwischen Sätzen">
+              <div className="grid grid-cols-4 gap-2">
+                {[60, 90, 120, 180].map((s) => (
+                  <button key={s} onClick={() => setRest(s)}
+                    className={`py-3 rounded-xl border font-bold ${state.profile.restSeconds === s ? 'bg-emerald-100 border-emerald-400 text-emerald-900' : 'bg-gray-50 border-gray-200 text-gray-700'}`}>
+                    {s}s
+                  </button>
+                ))}
+              </div>
+            </Section>
+
+            <Section title="Urlaub & Deload">
+              <div className="space-y-2">
+                <div className="rounded-2xl bg-gray-50 border border-gray-200 p-4">
+                  <div className="flex items-center justify-between mb-2">
+                    <div className="text-sm font-semibold text-gray-900">Urlaubsmodus</div>
+                    <div className="text-xs text-gray-500">Streak friert ein</div>
+                  </div>
+                  <input
+                    type="date"
+                    value={state.vacationUntil || ''}
+                    onChange={(e) => persist({ ...state, vacationUntil: e.target.value || null })}
+                    className="w-full bg-white border border-gray-200 focus:border-emerald-500 rounded-xl px-3 py-2.5 text-gray-900 outline-none text-sm font-mono-num"
+                  />
+                  <div className="text-[10px] text-gray-400 mt-1.5">Datum setzen um Streak-Schutz zu aktivieren. Löschen zum Deaktivieren.</div>
+                </div>
+                <button
+                  onClick={() => persist({ ...state, deloadMode: !state.deloadMode })}
+                  className={`w-full p-4 rounded-2xl border transition flex items-center justify-between ${state.deloadMode ? 'bg-amber-50 border-amber-300 text-amber-900' : 'bg-gray-50 border-gray-200 text-gray-800'}`}>
+                  <div>
+                    <div className="font-semibold text-sm">Deload-Modus</div>
+                    <div className={`text-xs mt-0.5 ${state.deloadMode ? 'text-amber-800/70' : 'text-gray-500'}`}>-20% Gewicht · halbe XP</div>
+                  </div>
+                  {state.deloadMode && <Icon.Check size={20} strokeWidth={3} className="text-amber-700" />}
+                </button>
+              </div>
+            </Section>
+
+            <Section title="Übungen anpassen">
+              <div className="text-[11px] text-gray-500 mb-2 px-1">Dauerhaft Übungen tauschen, hinzufügen oder Sätze ändern.</div>
+              {state.userPlans && state.userPlans[state.profile.plan] ? (
+                <div className="text-[11px] text-gray-500 bg-gray-50 rounded-xl p-3 text-center">Eigene Pläne direkt im Plan-Editor bearbeiten.</div>
+              ) : (
+              <div className="space-y-2">
+                {[...new Set(PLAN_DEFS[state.profile.plan]?.days || [])].map((key) => {
+                  const tmpl = getTemplate(key, state.customTemplates);
+                  const isCustom = !!(state.customTemplates && state.customTemplates[key]);
+                  return (
+                    <button key={key} onClick={() => setEditorKey(key)}
+                      className="w-full text-left p-4 rounded-2xl border border-gray-200 bg-gray-50 hover:bg-gray-100 transition flex items-center gap-3">
+                      <div className="w-10 h-10 rounded-xl bg-gray-100 flex items-center justify-center font-display text-xl text-emerald-700">{tmpl.code}</div>
+                      <div className="flex-1 min-w-0">
+                        <div className="font-semibold text-gray-900 flex items-center gap-2">
+                          {tmpl.name}
+                          {isCustom && <span className="text-[10px] bg-emerald-100 text-emerald-700 px-1.5 py-0.5 rounded">angepasst</span>}
+                        </div>
+                        <div className="text-xs text-gray-500 mt-0.5">{tmpl.exercises.length} Übungen · {tmpl.exercises.reduce((s, e) => s + e.sets, 0)} Sätze</div>
+                      </div>
+                      <Icon.Edit3 size={16} className="text-gray-500" />
+                    </button>
+                  );
+                })}
+              </div>
+              )}
+            </Section>
+
+            <Section title="Benachrichtigungen">
+              <div className="rounded-2xl bg-gray-50 border border-gray-200 p-4 space-y-3">
+                {notifPermission === 'unsupported' && (
+                  <div className="text-xs text-gray-500">Notifications werden in diesem Browser nicht unterstützt.</div>
+                )}
+                {notifPermission === 'denied' && (
+                  <div className="text-xs text-red-600 bg-red-50 border border-red-200 rounded-xl p-3">
+                    Notifications blockiert. Gehe in den iOS-Einstellungen zu Safari → Websites → Mitteilungen und erlaube sie für diese Seite.
+                  </div>
+                )}
+                {(notifPermission === 'default' || notifPermission === 'granted') && (
+                  <button onClick={async () => { const r = await window.IronblockNotif?.requestPermission(); if (r) setNotifPermission(r); }}
+                    className={`w-full flex items-center justify-between p-1 ${notifPermission === 'granted' ? 'cursor-default' : ''}`}>
+                    <div>
+                      <div className="text-sm font-semibold text-gray-900 text-left">{notifPermission === 'granted' ? '✓ Notifications aktiviert' : 'Notifications aktivieren'}</div>
+                      <div className="text-xs text-gray-500 mt-0.5 text-left">{notifPermission === 'granted' ? 'Pause-Timer & Streak-Warnung aktiv' : 'Erlaubt Pause-Timer & Streak-Warnung'}</div>
+                    </div>
+                    {notifPermission !== 'granted' && <span className="px-3 py-1.5 rounded-xl bg-emerald-100 text-emerald-900 text-xs font-bold flex-shrink-0">Erlauben</span>}
+                  </button>
+                )}
+                {notifPermission === 'granted' && (
+                  <div className="space-y-2 pt-1 border-t border-gray-200">
+                    <div className="flex items-center gap-2 text-xs text-gray-600"><Icon.Clock size={12} className="text-emerald-600" /><span>⏱ Pause-Timer — nach jedem Satz</span></div>
+                    <div className="flex items-center gap-2 text-xs text-gray-600"><Icon.Flame size={12} className="text-amber-500" /><span>🔥 Streak-Warnung — täglich um 20:00 Uhr</span></div>
+                  </div>
+                )}
+              </div>
+            </Section>
+
+            <Section title="Cloud Sync">
+              <CloudSyncSection syncConfig={syncConfig} updateSyncConfig={updateSyncConfig} syncStatus={syncStatus} appState={state} />
+            </Section>
+
+            <Section title="Daten">
+              <button onClick={exportData} className="w-full p-4 rounded-2xl border border-gray-300 bg-gray-50 text-gray-800 text-sm font-medium flex items-center justify-center gap-2 mb-2">
+                <Icon.Share size={16} /> Backup exportieren (JSON)
+              </button>
+              <input
+                type="file"
+                accept=".json"
+                id="importFile"
+                className="hidden"
+                onChange={(e) => {
+                  const file = e.target.files[0];
+                  if (!file) return;
+                  const reader = new FileReader();
+                  reader.onload = (ev) => {
+                    try {
+                      const imported = JSON.parse(ev.target.result);
+                      if (!Array.isArray(imported.workouts)) {
+                        alert('Ungültige Datei: workouts fehlt');
+                        return;
+                      }
+                      if (confirm(imported.workouts.length + ' Workouts gefunden. Vorhandene Daten überschreiben?')) {
+                        persist(imported);
+                        alert('Backup erfolgreich importiert!');
+                      }
+                    } catch (err) {
+                      alert('Fehler beim Lesen: ' + err.message);
+                    }
+                    e.target.value = '';
+                  };
+                  reader.readAsText(file);
+                }}
+              />
+              <button onClick={() => document.getElementById('importFile').click()} className="w-full p-4 rounded-2xl border border-gray-300 bg-gray-50 text-gray-800 text-sm font-medium flex items-center justify-center gap-2 mb-2">
+                <Icon.Download size={16} /> Backup importieren (JSON)
+              </button>
+              {hasBackup() && (
+                <button onClick={() => {
+                  const restored = restoreFromBackup();
+                  if (restored) {
+                    persist(restored, true);
+                    alert('Backup wiederhergestellt! ' + (restored.workouts?.length || 0) + ' Workouts gefunden.');
+                    setView('dashboard');
+                  }
+                }} className="w-full p-4 rounded-2xl border border-amber-500/30 bg-amber-500/10 text-amber-300 text-sm font-medium flex items-center justify-center gap-2 mb-2">
+                  <Icon.RotateCcw size={16} /> Backup wiederherstellen ({(() => { const b = loadBackup(); return b ? (b.workouts?.length || 0) + ' Workouts' : ''; })()})
+                </button>
+              )}
+              <button onClick={() => setConfirmReset(true)} className="w-full p-4 rounded-2xl border border-red-500/30 bg-red-500/10 text-red-300 text-sm font-medium flex items-center justify-center gap-2">
+                <Icon.RotateCcw size={16} /> Alles zurücksetzen
+              </button>
+              <div className="text-[11px] text-gray-400 mt-2 text-center">Lokal gespeichert · Offline-fähig</div>
+            </Section>
+
+            <div className="text-center text-gray-300 text-[10px] pt-4">
+              IRONBLOCK · v1.0 · Hypertrophie &lt; 60 min
+            </div>
+          </div>
+
+          {planCreatorKey && (
+            <PlanCreator
+              planKey={planCreatorKey}
+              existing={planCreatorKey !== '__new__' ? state.userPlans?.[planCreatorKey] : null}
+              onSave={(key, plan) => {
+                const next = { ...(state.userPlans || {}), [key]: plan };
+                persist({ ...state, userPlans: next, profile: { ...state.profile, plan: key, sessionIndex: 0 } });
+                setPlanCreator(null);
+              }}
+              onDelete={(key) => {
+                const next = { ...(state.userPlans || {}) };
+                delete next[key];
+                const fallback = Object.keys(next)[0] || '3_fullbody_alt';
+                persist({ ...state, userPlans: next, profile: { ...state.profile, plan: fallback, sessionIndex: 0 } });
+                setPlanCreator(null);
+              }}
+              onClose={() => setPlanCreator(null)}
+            />
+          )}
+
+          {editorKey && (
+            <TemplateEditor
+              templateKey={editorKey}
+              current={getTemplate(editorKey, state.customTemplates)}
+              isCustom={!!(state.customTemplates && state.customTemplates[editorKey])}
+              onSave={(exercises) => { saveTemplateOverride(editorKey, exercises); setEditorKey(null); }}
+              onReset={() => { resetTemplate(editorKey); setEditorKey(null); }}
+              onClose={() => setEditorKey(null)}
+            />
+          )}
+
+          {confirmReset && (
+            <div className="fixed inset-0 bg-black/40 backdrop-blur-sm flex items-center justify-center px-5 z-50">
+              <div className="bg-gray-50 border border-gray-200 rounded-3xl p-6 max-w-sm w-full">
+                <Icon.AlertTriangle size={32} className="text-red-400 mx-auto" />
+                <div className="font-display text-3xl text-center mt-3">ALLES LÖSCHEN?</div>
+                <div className="text-sm text-gray-600 text-center mt-2">Verlauf, XP und Streaks werden unwiderruflich gelöscht.</div>
+                <div className="mt-5 flex gap-2">
+                  <button onClick={() => setConfirmReset(false)} className="flex-1 py-3 rounded-xl bg-gray-100 text-gray-800 font-medium">Abbrechen</button>
+                  <button onClick={doReset} className="flex-1 py-3 rounded-xl bg-red-500 text-emerald-900 font-bold">Löschen</button>
+                </div>
+              </div>
+            </div>
+          )}
+
+          <BottomNav active="settings" setView={setView} hasHistory={state.workouts.length > 0} />
+        </div>
+      );
+    };
+
+    // ========================================================================
+
     const ActivityView = ({ state, persist, setView }) => {
       const activities = state.activities || [];
       const [showForm, setShowForm] = useState(false);
