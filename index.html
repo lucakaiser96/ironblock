@@ -1000,6 +1000,113 @@
         }
       };
 
+
+      // ── Weekly / Monthly Report ───────────────────────────────────────────
+      const [report, setReport]           = useState(null);  // { type, text, generatedAt }
+      const [reportLoading, setReportLoading] = useState(false);
+      const [reportOpen, setReportOpen]   = useState(false);
+
+      const shouldShowReport = useMemo(() => {
+        const now = new Date();
+        const isMonday = now.getDay() === 1;
+        const isFirstOfMonth = now.getDate() === 1;
+        const isReportDay = isMonday || isFirstOfMonth;
+        if (!isReportDay) return null;
+        const type = isFirstOfMonth ? 'monthly' : 'weekly';
+        // Only show once per day
+        if (report?.generatedAt?.slice(0, 10) === todayStr && report?.type === type) return null;
+        if (state.workouts.length === 0) return null;
+        return type;
+      }, [todayStr, report]);
+
+      const generateReport = async (type) => {
+        setReportLoading(true);
+        setReportOpen(true);
+
+        const now = new Date();
+        const cutoff = type === 'weekly'
+          ? new Date(now - 7 * 86400000)
+          : new Date(now.getFullYear(), now.getMonth() - 1, 1);
+        const cutoffEnd = type === 'monthly'
+          ? new Date(now.getFullYear(), now.getMonth(), 1)
+          : now;
+
+        const periodWorkouts = state.workouts.filter(w => {
+          const d = new Date(w.date);
+          return d >= cutoff && d <= cutoffEnd;
+        });
+        const periodActivities = (state.activities || []).filter(a => {
+          const d = new Date(a.date);
+          return d >= cutoff && d <= cutoffEnd;
+        });
+        const goals = Object.entries(state.goals || {}).map(([name, g]) => ({
+          name, current: g.current, target: g.target, unit: g.unit, targetDate: g.targetDate,
+        }));
+
+        const prompt = `Du bist ein persönlicher Fitness-Coach. Analysiere die Trainingsdaten und gib einen ${type === 'weekly' ? 'Wochenreport (letzte 7 Tage)' : 'Monatsreport (letzter Monat)'} auf Deutsch.
+
+TRAININGSDATEN (${type === 'weekly' ? 'letzte 7 Tage' : 'letzter Monat'}):
+Krafttraining: ${periodWorkouts.length} Einheiten
+${periodWorkouts.map(w => `- ${w.templateName}: ${w.setsCompleted} Sätze, ${w.totalVolume}kg Volumen, ${w.durationMin}min${w.note ? `, Notiz: "${w.note}"` : ''}`).join('\n')}
+
+Aktivitäten: ${periodActivities.length} Einheiten
+${periodActivities.map(a => `- ${a.activityType === 'jogging' ? 'Joggen' : 'Tennis'}: ${a.durationMin}min${a.km ? `, ${a.km}km` : ''}${a.bpm ? `, ${a.bpm}bpm` : ''}`).join('\n')}
+
+PERSÖNLICHE ZIELE:
+${goals.length > 0 ? goals.map(g => `- ${g.name}: aktuell ${g.current}${g.unit}, Ziel ${g.target}${g.unit} bis ${g.targetDate}`).join('\n') : 'Keine Ziele gesetzt'}
+
+Erstelle einen strukturierten Report mit:
+1. **Zusammenfassung** – Was wurde diese ${type === 'weekly' ? 'Woche' : 'Monat'} geleistet?
+2. **Highlights** – Was lief besonders gut?
+3. **Ziel-Check** – Fortschritt zu den gesetzten Zielen (falls vorhanden)
+4. **Tipps pro Übung** – Konkrete Verbesserungsvorschläge für die trainierten Übungen
+5. **Fokus für ${type === 'weekly' ? 'nächste Woche' : 'nächsten Monat'}** – 2-3 konkrete Empfehlungen
+
+Sei direkt, motivierend und spezifisch. Kein allgemeines Blabla.`;
+
+        try {
+          const apiKey = localStorage.getItem('ironblock_anthropic_key') || '';
+          if (!apiKey) {
+            setReport({ type, text: '⚠️ Kein API-Key hinterlegt. Bitte trage deinen Anthropic API-Key in den Einstellungen ein.', generatedAt: new Date().toISOString() });
+            setReportLoading(false);
+            return;
+          }
+          const res = await fetch('https://api.anthropic.com/v1/messages', {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json',
+              'x-api-key': apiKey,
+              'anthropic-version': '2023-06-01',
+              'anthropic-dangerous-direct-browser-access': 'true',
+            },
+            body: JSON.stringify({
+              model: 'claude-sonnet-4-6',
+              max_tokens: 1000,
+              messages: [{ role: 'user', content: prompt }],
+            }),
+          });
+          const data = await res.json();
+          const text = data.content?.find(b => b.type === 'text')?.text || 'Fehler beim Generieren.';
+          const newReport = { type, text, generatedAt: new Date().toISOString() };
+          setReport(newReport);
+          persist({ ...state, lastReport: newReport });
+        } catch {
+          setReport({ type, text: 'Verbindungsfehler. Bitte versuche es erneut.', generatedAt: new Date().toISOString() });
+        }
+        setReportLoading(false);
+      };
+
+      // Auto-open report modal on report days if not yet generated today
+      useEffect(() => {
+        if (shouldShowReport && !report) {
+          const saved = state.lastReport;
+          if (saved?.generatedAt?.slice(0, 10) === todayStr && saved?.type === shouldShowReport) {
+            setReport(saved);
+            setReportOpen(true);
+          }
+        }
+      }, [shouldShowReport]);
+
       return (
         <div className="min-h-screen pb-28 relative grain">
           <div className="px-5 pt-6 pb-4 flex items-end justify-between">
@@ -1247,112 +1354,6 @@
             </div>
           )}
 
-      // ── Weekly / Monthly Report ───────────────────────────────────────────
-      const [report, setReport]           = useState(null);  // { type, text, generatedAt }
-      const [reportLoading, setReportLoading] = useState(false);
-      const [reportOpen, setReportOpen]   = useState(false);
-
-      const shouldShowReport = useMemo(() => {
-        const now = new Date();
-        const isMonday = now.getDay() === 1;
-        const isFirstOfMonth = now.getDate() === 1;
-        const isReportDay = isMonday || isFirstOfMonth;
-        if (!isReportDay) return null;
-        const type = isFirstOfMonth ? 'monthly' : 'weekly';
-        // Only show once per day
-        if (report?.generatedAt?.slice(0, 10) === todayStr && report?.type === type) return null;
-        if (state.workouts.length === 0) return null;
-        return type;
-      }, [todayStr, report]);
-
-      const generateReport = async (type) => {
-        setReportLoading(true);
-        setReportOpen(true);
-
-        const now = new Date();
-        const cutoff = type === 'weekly'
-          ? new Date(now - 7 * 86400000)
-          : new Date(now.getFullYear(), now.getMonth() - 1, 1);
-        const cutoffEnd = type === 'monthly'
-          ? new Date(now.getFullYear(), now.getMonth(), 1)
-          : now;
-
-        const periodWorkouts = state.workouts.filter(w => {
-          const d = new Date(w.date);
-          return d >= cutoff && d <= cutoffEnd;
-        });
-        const periodActivities = (state.activities || []).filter(a => {
-          const d = new Date(a.date);
-          return d >= cutoff && d <= cutoffEnd;
-        });
-        const goals = Object.entries(state.goals || {}).map(([name, g]) => ({
-          name, current: g.current, target: g.target, unit: g.unit, targetDate: g.targetDate,
-        }));
-
-        const prompt = `Du bist ein persönlicher Fitness-Coach. Analysiere die Trainingsdaten und gib einen ${type === 'weekly' ? 'Wochenreport (letzte 7 Tage)' : 'Monatsreport (letzter Monat)'} auf Deutsch.
-
-TRAININGSDATEN (${type === 'weekly' ? 'letzte 7 Tage' : 'letzter Monat'}):
-Krafttraining: ${periodWorkouts.length} Einheiten
-${periodWorkouts.map(w => `- ${w.templateName}: ${w.setsCompleted} Sätze, ${w.totalVolume}kg Volumen, ${w.durationMin}min${w.note ? `, Notiz: "${w.note}"` : ''}`).join('\n')}
-
-Aktivitäten: ${periodActivities.length} Einheiten
-${periodActivities.map(a => `- ${a.activityType === 'jogging' ? 'Joggen' : 'Tennis'}: ${a.durationMin}min${a.km ? `, ${a.km}km` : ''}${a.bpm ? `, ${a.bpm}bpm` : ''}`).join('\n')}
-
-PERSÖNLICHE ZIELE:
-${goals.length > 0 ? goals.map(g => `- ${g.name}: aktuell ${g.current}${g.unit}, Ziel ${g.target}${g.unit} bis ${g.targetDate}`).join('\n') : 'Keine Ziele gesetzt'}
-
-Erstelle einen strukturierten Report mit:
-1. **Zusammenfassung** – Was wurde diese ${type === 'weekly' ? 'Woche' : 'Monat'} geleistet?
-2. **Highlights** – Was lief besonders gut?
-3. **Ziel-Check** – Fortschritt zu den gesetzten Zielen (falls vorhanden)
-4. **Tipps pro Übung** – Konkrete Verbesserungsvorschläge für die trainierten Übungen
-5. **Fokus für ${type === 'weekly' ? 'nächste Woche' : 'nächsten Monat'}** – 2-3 konkrete Empfehlungen
-
-Sei direkt, motivierend und spezifisch. Kein allgemeines Blabla.`;
-
-        try {
-          const apiKey = localStorage.getItem('ironblock_anthropic_key') || '';
-          if (!apiKey) {
-            setReport({ type, text: '⚠️ Kein API-Key hinterlegt. Bitte trage deinen Anthropic API-Key in den Einstellungen ein.', generatedAt: new Date().toISOString() });
-            setReportLoading(false);
-            return;
-          }
-          const res = await fetch('https://api.anthropic.com/v1/messages', {
-            method: 'POST',
-            headers: {
-              'Content-Type': 'application/json',
-              'x-api-key': apiKey,
-              'anthropic-version': '2023-06-01',
-              'anthropic-dangerous-direct-browser-access': 'true',
-            },
-            body: JSON.stringify({
-              model: 'claude-sonnet-4-6',
-              max_tokens: 1000,
-              messages: [{ role: 'user', content: prompt }],
-            }),
-          });
-          const data = await res.json();
-          const text = data.content?.find(b => b.type === 'text')?.text || 'Fehler beim Generieren.';
-          const newReport = { type, text, generatedAt: new Date().toISOString() };
-          setReport(newReport);
-          persist({ ...state, lastReport: newReport });
-        } catch {
-          setReport({ type, text: 'Verbindungsfehler. Bitte versuche es erneut.', generatedAt: new Date().toISOString() });
-        }
-        setReportLoading(false);
-      };
-
-      // Auto-open report modal on report days if not yet generated today
-      useEffect(() => {
-        if (shouldShowReport && !report) {
-          const saved = state.lastReport;
-          if (saved?.generatedAt?.slice(0, 10) === todayStr && saved?.type === shouldShowReport) {
-            setReport(saved);
-            setReportOpen(true);
-          }
-        }
-      }, [shouldShowReport]);
-
           {/* Report Banner */}
           {(shouldShowReport || report) && (
             <div className="px-5 mt-4">
@@ -1381,9 +1382,7 @@ Sei direkt, motivierend und spezifisch. Kein allgemeines Blabla.`;
                 <button onClick={() => setReportOpen(false)} className="text-gray-400"><Icon.X size={22} /></button>
                 <div>
                   <div className="text-xs uppercase tracking-wider text-gray-500">KI-Coach</div>
-                  <div className="font-display text-2xl text-gray-900">
-                    {report?.type === 'monthly' ? 'MONATSREPORT' : 'WOCHENREPORT'}
-                  </div>
+                  <div className="font-display text-2xl text-gray-900">{report?.type === 'monthly' ? 'MONATSREPORT' : 'WOCHENREPORT'}</div>
                 </div>
               </div>
               <div className="flex-1 overflow-y-auto px-5 py-4">
@@ -1393,40 +1392,26 @@ Sei direkt, motivierend und spezifisch. Kein allgemeines Blabla.`;
                     <div className="text-sm text-gray-500">Coach analysiert dein Training…</div>
                   </div>
                 ) : report?.text ? (
-                  <div className="prose prose-sm max-w-none">
-                    {report.text.split('\n').map((line, i) => {
-                      if (!line.trim()) return <div key={i} className="h-3" />;
-                      if (line.startsWith('**') && line.endsWith('**')) {
-                        return <div key={i} className="font-bold text-gray-900 mt-4 mb-1">{line.replace(/\*\*/g, '')}</div>;
+                  <div>
+                    {report.text.split('\n').map((ln, i) => {
+                      if (!ln.trim()) return <div key={i} className="h-3" />;
+                      if (ln.match(/^\*\*.+\*\*$/) || ln.match(/^\d+\.\s\*\*/)) {
+                        return <div key={i} className="font-bold text-violet-900 mt-4 mb-1">{ln.replace(/\*\*/g, '').replace(/^\d+\.\s/, '')}</div>;
                       }
-                      if (line.match(/^\d+\.\s\*\*/)) {
-                        const clean = line.replace(/^\d+\.\s/, '').replace(/\*\*/g, '');
-                        return <div key={i} className="font-bold text-violet-900 mt-4 mb-1">{clean}</div>;
+                      if (ln.startsWith('- ') || ln.startsWith('• ')) {
+                        return <div key={i} className="flex gap-2 text-sm text-gray-700 mb-1.5"><span className="text-violet-400 flex-shrink-0 mt-0.5">•</span><span>{ln.replace(/^[-•]\s/, '')}</span></div>;
                       }
-                      if (line.startsWith('- ') || line.startsWith('• ')) {
-                        return <div key={i} className="flex gap-2 text-sm text-gray-700 mb-1"><span className="text-violet-400 flex-shrink-0">•</span><span>{line.replace(/^[-•]\s/, '')}</span></div>;
-                      }
-                      return <div key={i} className="text-sm text-gray-700 mb-1 leading-relaxed">{line}</div>;
+                      return <div key={i} className="text-sm text-gray-700 mb-1 leading-relaxed">{ln}</div>;
                     })}
                   </div>
                 ) : null}
               </div>
-              {!reportLoading && shouldShowReport && (
-                <div className="px-5 pb-8 pt-3 border-t border-gray-100">
-                  <button onClick={() => generateReport(shouldShowReport)}
-                    className="w-full py-4 rounded-2xl bg-violet-600 text-white font-display text-xl active:scale-[0.98] transition">
-                    REPORT GENERIEREN
-                  </button>
-                </div>
-              )}
-              {!reportLoading && report && !shouldShowReport && (
-                <div className="px-5 pb-8 pt-3 border-t border-gray-100">
-                  <button onClick={() => generateReport(report.type)}
-                    className="w-full py-3 rounded-2xl border border-gray-200 text-gray-600 text-sm active:scale-[0.98] transition">
-                    Neu generieren
-                  </button>
-                </div>
-              )}
+              <div className="px-5 pb-8 pt-3 border-t border-gray-100">
+                <button onClick={() => generateReport(shouldShowReport || report?.type || 'weekly')}
+                  className="w-full py-4 rounded-2xl bg-violet-600 text-white font-display text-xl active:scale-[0.98] transition">
+                  {report ? 'NEU GENERIEREN' : 'REPORT GENERIEREN'}
+                </button>
+              </div>
             </div>
           )}
 
