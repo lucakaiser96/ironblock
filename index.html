@@ -118,6 +118,8 @@
       Calendar: (p) => <SVG {...p}><rect x="3" y="4" width="18" height="18" rx="2" ry="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></SVG>,
       Download: (p) => <SVG {...p}><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></SVG>,
       Shuffle: (p) => <SVG {...p}><polyline points="16 3 21 3 21 8"/><line x1="4" y1="20" x2="21" y2="3"/><polyline points="21 16 21 21 16 21"/><line x1="15" y1="15" x2="21" y2="21"/><line x1="4" y1="4" x2="9" y2="9"/></SVG>,
+      Eye: (p) => <SVG {...p}><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></SVG>,
+      EyeOff: (p) => <SVG {...p}><path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94"/><path d="M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19"/><line x1="1" y1="1" x2="23" y2="23"/></SVG>,
       Search: (p) => <SVG {...p}><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></SVG>,
       MapPin: (p) => <SVG {...p}><path d="M20 10c0 6-8 12-8 12S4 16 4 10a8 8 0 0 1 16 0Z"/><circle cx="12" cy="10" r="3"/></SVG>,
       Heart: (p) => <SVG {...p}><path d="M19 14c1.49-1.46 3-3.21 3-5.5A5.5 5.5 0 0 0 16.5 3c-1.76 0-3 .5-4.5 2-1.5-1.5-2.74-2-4.5-2A5.5 5.5 0 0 0 2 8.5c0 2.3 1.5 4.05 3 5.5l7 7Z"/></SVG>,
@@ -1242,6 +1244,189 @@
                     className="flex-1 py-3 rounded-xl bg-emerald-500 disabled:bg-gray-200 text-white disabled:text-gray-400 font-bold">Speichern</button>
                 </div>
               </div>
+            </div>
+          )}
+
+      // ── Weekly / Monthly Report ───────────────────────────────────────────
+      const [report, setReport]           = useState(null);  // { type, text, generatedAt }
+      const [reportLoading, setReportLoading] = useState(false);
+      const [reportOpen, setReportOpen]   = useState(false);
+
+      const shouldShowReport = useMemo(() => {
+        const now = new Date();
+        const isMonday = now.getDay() === 1;
+        const isFirstOfMonth = now.getDate() === 1;
+        const isReportDay = isMonday || isFirstOfMonth;
+        if (!isReportDay) return null;
+        const type = isFirstOfMonth ? 'monthly' : 'weekly';
+        // Only show once per day
+        if (report?.generatedAt?.slice(0, 10) === todayStr && report?.type === type) return null;
+        if (state.workouts.length === 0) return null;
+        return type;
+      }, [todayStr, report]);
+
+      const generateReport = async (type) => {
+        setReportLoading(true);
+        setReportOpen(true);
+
+        const now = new Date();
+        const cutoff = type === 'weekly'
+          ? new Date(now - 7 * 86400000)
+          : new Date(now.getFullYear(), now.getMonth() - 1, 1);
+        const cutoffEnd = type === 'monthly'
+          ? new Date(now.getFullYear(), now.getMonth(), 1)
+          : now;
+
+        const periodWorkouts = state.workouts.filter(w => {
+          const d = new Date(w.date);
+          return d >= cutoff && d <= cutoffEnd;
+        });
+        const periodActivities = (state.activities || []).filter(a => {
+          const d = new Date(a.date);
+          return d >= cutoff && d <= cutoffEnd;
+        });
+        const goals = Object.entries(state.goals || {}).map(([name, g]) => ({
+          name, current: g.current, target: g.target, unit: g.unit, targetDate: g.targetDate,
+        }));
+
+        const prompt = `Du bist ein persönlicher Fitness-Coach. Analysiere die Trainingsdaten und gib einen ${type === 'weekly' ? 'Wochenreport (letzte 7 Tage)' : 'Monatsreport (letzter Monat)'} auf Deutsch.
+
+TRAININGSDATEN (${type === 'weekly' ? 'letzte 7 Tage' : 'letzter Monat'}):
+Krafttraining: ${periodWorkouts.length} Einheiten
+${periodWorkouts.map(w => `- ${w.templateName}: ${w.setsCompleted} Sätze, ${w.totalVolume}kg Volumen, ${w.durationMin}min${w.note ? `, Notiz: "${w.note}"` : ''}`).join('\n')}
+
+Aktivitäten: ${periodActivities.length} Einheiten
+${periodActivities.map(a => `- ${a.activityType === 'jogging' ? 'Joggen' : 'Tennis'}: ${a.durationMin}min${a.km ? `, ${a.km}km` : ''}${a.bpm ? `, ${a.bpm}bpm` : ''}`).join('\n')}
+
+PERSÖNLICHE ZIELE:
+${goals.length > 0 ? goals.map(g => `- ${g.name}: aktuell ${g.current}${g.unit}, Ziel ${g.target}${g.unit} bis ${g.targetDate}`).join('\n') : 'Keine Ziele gesetzt'}
+
+Erstelle einen strukturierten Report mit:
+1. **Zusammenfassung** – Was wurde diese ${type === 'weekly' ? 'Woche' : 'Monat'} geleistet?
+2. **Highlights** – Was lief besonders gut?
+3. **Ziel-Check** – Fortschritt zu den gesetzten Zielen (falls vorhanden)
+4. **Tipps pro Übung** – Konkrete Verbesserungsvorschläge für die trainierten Übungen
+5. **Fokus für ${type === 'weekly' ? 'nächste Woche' : 'nächsten Monat'}** – 2-3 konkrete Empfehlungen
+
+Sei direkt, motivierend und spezifisch. Kein allgemeines Blabla.`;
+
+        try {
+          const apiKey = localStorage.getItem('ironblock_anthropic_key') || '';
+          if (!apiKey) {
+            setReport({ type, text: '⚠️ Kein API-Key hinterlegt. Bitte trage deinen Anthropic API-Key in den Einstellungen ein.', generatedAt: new Date().toISOString() });
+            setReportLoading(false);
+            return;
+          }
+          const res = await fetch('https://api.anthropic.com/v1/messages', {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json',
+              'x-api-key': apiKey,
+              'anthropic-version': '2023-06-01',
+              'anthropic-dangerous-direct-browser-access': 'true',
+            },
+            body: JSON.stringify({
+              model: 'claude-sonnet-4-6',
+              max_tokens: 1000,
+              messages: [{ role: 'user', content: prompt }],
+            }),
+          });
+          const data = await res.json();
+          const text = data.content?.find(b => b.type === 'text')?.text || 'Fehler beim Generieren.';
+          const newReport = { type, text, generatedAt: new Date().toISOString() };
+          setReport(newReport);
+          persist({ ...state, lastReport: newReport });
+        } catch {
+          setReport({ type, text: 'Verbindungsfehler. Bitte versuche es erneut.', generatedAt: new Date().toISOString() });
+        }
+        setReportLoading(false);
+      };
+
+      // Auto-open report modal on report days if not yet generated today
+      useEffect(() => {
+        if (shouldShowReport && !report) {
+          const saved = state.lastReport;
+          if (saved?.generatedAt?.slice(0, 10) === todayStr && saved?.type === shouldShowReport) {
+            setReport(saved);
+            setReportOpen(true);
+          }
+        }
+      }, [shouldShowReport]);
+
+          {/* Report Banner */}
+          {(shouldShowReport || report) && (
+            <div className="px-5 mt-4">
+              <button onClick={() => shouldShowReport ? generateReport(shouldShowReport) : setReportOpen(true)}
+                className="w-full rounded-2xl bg-gradient-to-r from-violet-50 to-indigo-50 border border-violet-200 p-4 flex items-center gap-3 active:scale-[0.99] transition">
+                <div className="w-10 h-10 rounded-xl bg-violet-100 flex items-center justify-center flex-shrink-0 text-xl">
+                  {shouldShowReport === 'monthly' || report?.type === 'monthly' ? '📅' : '📊'}
+                </div>
+                <div className="flex-1 text-left">
+                  <div className="font-semibold text-violet-900 text-sm">
+                    {shouldShowReport === 'monthly' ? 'Monatsreport verfügbar' : shouldShowReport === 'weekly' ? 'Wochenreport verfügbar' : report?.type === 'monthly' ? 'Monatsreport' : 'Wochenreport'}
+                  </div>
+                  <div className="text-xs text-violet-600 mt-0.5">
+                    {report?.generatedAt ? `Erstellt ${formatDateLong(report.generatedAt)}` : 'KI-Analyse deines Trainings'}
+                  </div>
+                </div>
+                <Icon.ChevronRight size={16} className="text-violet-400" />
+              </button>
+            </div>
+          )}
+
+          {/* Report Modal */}
+          {reportOpen && (
+            <div className="fixed inset-0 z-50 flex flex-col bg-white" style={{ paddingTop: 'env(safe-area-inset-top)' }}>
+              <div className="flex items-center gap-3 px-5 pt-5 pb-4 border-b border-gray-100">
+                <button onClick={() => setReportOpen(false)} className="text-gray-400"><Icon.X size={22} /></button>
+                <div>
+                  <div className="text-xs uppercase tracking-wider text-gray-500">KI-Coach</div>
+                  <div className="font-display text-2xl text-gray-900">
+                    {report?.type === 'monthly' ? 'MONATSREPORT' : 'WOCHENREPORT'}
+                  </div>
+                </div>
+              </div>
+              <div className="flex-1 overflow-y-auto px-5 py-4">
+                {reportLoading ? (
+                  <div className="flex flex-col items-center justify-center h-64 gap-4">
+                    <div className="w-10 h-10 border-2 border-violet-300 border-t-violet-600 rounded-full animate-spin" />
+                    <div className="text-sm text-gray-500">Coach analysiert dein Training…</div>
+                  </div>
+                ) : report?.text ? (
+                  <div className="prose prose-sm max-w-none">
+                    {report.text.split('\n').map((line, i) => {
+                      if (!line.trim()) return <div key={i} className="h-3" />;
+                      if (line.startsWith('**') && line.endsWith('**')) {
+                        return <div key={i} className="font-bold text-gray-900 mt-4 mb-1">{line.replace(/\*\*/g, '')}</div>;
+                      }
+                      if (line.match(/^\d+\.\s\*\*/)) {
+                        const clean = line.replace(/^\d+\.\s/, '').replace(/\*\*/g, '');
+                        return <div key={i} className="font-bold text-violet-900 mt-4 mb-1">{clean}</div>;
+                      }
+                      if (line.startsWith('- ') || line.startsWith('• ')) {
+                        return <div key={i} className="flex gap-2 text-sm text-gray-700 mb-1"><span className="text-violet-400 flex-shrink-0">•</span><span>{line.replace(/^[-•]\s/, '')}</span></div>;
+                      }
+                      return <div key={i} className="text-sm text-gray-700 mb-1 leading-relaxed">{line}</div>;
+                    })}
+                  </div>
+                ) : null}
+              </div>
+              {!reportLoading && shouldShowReport && (
+                <div className="px-5 pb-8 pt-3 border-t border-gray-100">
+                  <button onClick={() => generateReport(shouldShowReport)}
+                    className="w-full py-4 rounded-2xl bg-violet-600 text-white font-display text-xl active:scale-[0.98] transition">
+                    REPORT GENERIEREN
+                  </button>
+                </div>
+              )}
+              {!reportLoading && report && !shouldShowReport && (
+                <div className="px-5 pb-8 pt-3 border-t border-gray-100">
+                  <button onClick={() => generateReport(report.type)}
+                    className="w-full py-3 rounded-2xl border border-gray-200 text-gray-600 text-sm active:scale-[0.98] transition">
+                    Neu generieren
+                  </button>
+                </div>
+              )}
             </div>
           )}
 
@@ -3771,6 +3956,41 @@ with check (true);`}</pre>
                 })}
               </div>
               )}
+            </Section>
+
+            <Section title="KI-Coach API-Key">
+              {(() => {
+                const [apiKey, setApiKey] = useState(() => localStorage.getItem('ironblock_anthropic_key') || '');
+                const [saved, setSaved] = useState(false);
+                const [visible, setVisible] = useState(false);
+                return (
+                  <div className="rounded-2xl bg-gray-50 border border-gray-200 p-4 space-y-3">
+                    <div className="text-xs text-gray-500 leading-relaxed">
+                      Für den KI-Wochenreport brauchst du einen Anthropic API-Key.{' '}
+                      <span className="text-emerald-700 font-medium">console.anthropic.com</span> → API Keys → Create.
+                      Kostet ca. 0,01€ pro Report.
+                    </div>
+                    <div className="relative">
+                      <input
+                        type={visible ? 'text' : 'password'}
+                        value={apiKey}
+                        onChange={e => { setApiKey(e.target.value); setSaved(false); }}
+                        placeholder="sk-ant-..."
+                        className="w-full bg-white border border-gray-200 rounded-xl px-3 py-2.5 text-sm font-mono text-gray-900 outline-none focus:border-emerald-400 pr-10"
+                      />
+                      <button onClick={() => setVisible(v => !v)} className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400">
+                        {visible ? <Icon.EyeOff size={14} /> : <Icon.Eye size={14} />}
+                      </button>
+                    </div>
+                    <button
+                      onClick={() => { localStorage.setItem('ironblock_anthropic_key', apiKey.trim()); setSaved(true); }}
+                      disabled={!apiKey.trim()}
+                      className="w-full py-2.5 rounded-xl bg-emerald-100 disabled:bg-gray-100 disabled:text-gray-400 text-emerald-900 font-semibold text-sm transition">
+                      {saved ? '✓ Gespeichert' : 'Speichern'}
+                    </button>
+                  </div>
+                );
+              })()}
             </Section>
 
             <Section title="Benachrichtigungen">
