@@ -3776,6 +3776,39 @@ with check (true);`}</pre>
     // ========================================================================
     // SETTINGS VIEW
     // ========================================================================
+    const ApiKeySection = () => {
+      const [apiKey, setApiKey] = useState(() => localStorage.getItem('ironblock_anthropic_key') || '');
+      const [saved, setSaved]   = useState(false);
+      const [visible, setVisible] = useState(false);
+      return (
+        <div className="rounded-2xl bg-gray-50 border border-gray-200 p-4 space-y-3">
+          <div className="text-xs text-gray-500 leading-relaxed">
+            Für den KI-Wochenreport brauchst du einen Anthropic API-Key.{' '}
+            <span className="text-emerald-700 font-medium">console.anthropic.com</span> → API Keys → Create.
+            Kostet ca. 0,01€ pro Report.
+          </div>
+          <div className="relative">
+            <input
+              type={visible ? 'text' : 'password'}
+              value={apiKey}
+              onChange={e => { setApiKey(e.target.value); setSaved(false); }}
+              placeholder="sk-ant-..."
+              className="w-full bg-white border border-gray-200 rounded-xl px-3 py-2.5 text-sm font-mono text-gray-900 outline-none focus:border-emerald-400 pr-10"
+            />
+            <button onClick={() => setVisible(v => !v)} className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400">
+              {visible ? <Icon.EyeOff size={14} /> : <Icon.Eye size={14} />}
+            </button>
+          </div>
+          <button
+            onClick={() => { localStorage.setItem('ironblock_anthropic_key', apiKey.trim()); setSaved(true); }}
+            disabled={!apiKey.trim()}
+            className="w-full py-2.5 rounded-xl bg-emerald-100 disabled:bg-gray-100 disabled:text-gray-400 text-emerald-900 font-semibold text-sm transition">
+            {saved ? '✓ Gespeichert' : 'Speichern'}
+          </button>
+        </div>
+      );
+    };
+
     const SettingsView = ({ state, persist, setView, syncConfig, updateSyncConfig, syncStatus, notifPermission, setNotifPermission }) => {
       const [confirmReset, setConfirmReset] = useState(false);
       const [editorKey, setEditorKey] = useState(null);
@@ -3944,38 +3977,7 @@ with check (true);`}</pre>
             </Section>
 
             <Section title="KI-Coach API-Key">
-              {(() => {
-                const [apiKey, setApiKey] = useState(() => localStorage.getItem('ironblock_anthropic_key') || '');
-                const [saved, setSaved] = useState(false);
-                const [visible, setVisible] = useState(false);
-                return (
-                  <div className="rounded-2xl bg-gray-50 border border-gray-200 p-4 space-y-3">
-                    <div className="text-xs text-gray-500 leading-relaxed">
-                      Für den KI-Wochenreport brauchst du einen Anthropic API-Key.{' '}
-                      <span className="text-emerald-700 font-medium">console.anthropic.com</span> → API Keys → Create.
-                      Kostet ca. 0,01€ pro Report.
-                    </div>
-                    <div className="relative">
-                      <input
-                        type={visible ? 'text' : 'password'}
-                        value={apiKey}
-                        onChange={e => { setApiKey(e.target.value); setSaved(false); }}
-                        placeholder="sk-ant-..."
-                        className="w-full bg-white border border-gray-200 rounded-xl px-3 py-2.5 text-sm font-mono text-gray-900 outline-none focus:border-emerald-400 pr-10"
-                      />
-                      <button onClick={() => setVisible(v => !v)} className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400">
-                        {visible ? <Icon.EyeOff size={14} /> : <Icon.Eye size={14} />}
-                      </button>
-                    </div>
-                    <button
-                      onClick={() => { localStorage.setItem('ironblock_anthropic_key', apiKey.trim()); setSaved(true); }}
-                      disabled={!apiKey.trim()}
-                      className="w-full py-2.5 rounded-xl bg-emerald-100 disabled:bg-gray-100 disabled:text-gray-400 text-emerald-900 font-semibold text-sm transition">
-                      {saved ? '✓ Gespeichert' : 'Speichern'}
-                    </button>
-                  </div>
-                );
-              })()}
+              <ApiKeySection />
             </Section>
 
             <Section title="Benachrichtigungen">
