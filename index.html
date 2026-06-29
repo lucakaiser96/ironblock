@@ -848,6 +848,19 @@
       </div>
     );
 
+    class ErrorBoundary extends React.Component {
+      constructor(props) { super(props); this.state = { error: null }; }
+      static getDerivedStateFromError(e) { return { error: e.message }; }
+      render() {
+        if (this.state.error) return (
+          <div style={{padding:20,fontFamily:'monospace',fontSize:12,color:'red',whiteSpace:'pre-wrap'}}>
+            ERROR: {this.state.error}
+          </div>
+        );
+        return this.props.children;
+      }
+    }
+
     const BottomNav = ({ active, setView, hasHistory }) => {
       const items = [
         { key: 'dashboard', label: 'Start',      icon: Icon.Dumbbell },
@@ -4545,7 +4558,7 @@ with check (true);`}</pre>
     };
 
     const root = ReactDOM.createRoot(document.getElementById('root'));
-    root.render(<GymApp />);
+    root.render(<ErrorBoundary><GymApp /></ErrorBoundary>);
   </script>
 
   <!-- Service Worker + Notification bootstrap -->
