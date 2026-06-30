@@ -934,7 +934,7 @@
         <div className="fixed bottom-0 inset-x-0 bg-white/90 dark:bg-zinc-900/90 backdrop-blur border-t border-gray-200 dark:border-zinc-700 px-3 pt-2 fixed-bottom-nav flex z-30">
           {items.map(({ key, label, icon: IconCmp, disabled }) => (
             <button key={key} onClick={() => !disabled && setView(key)} disabled={disabled}
-              className={`flex-1 flex flex-col items-center gap-0.5 py-2 ${active === key ? 'text-emerald-700 dark:text-emerald-400' : disabled ? 'text-gray-300 dark:text-zinc-600' : 'text-gray-500 dark:text-zinc-400'}`}>
+              className={`flex-1 flex flex-col items-center gap-0.5 py-2 ${active === key ? 'text-emerald-700 dark:text-emerald-400' : disabled ? 'text-gray-300 dark:text-zinc-600' : 'text-gray-500 dark:text-zinc-500 dark:text-zinc-400'}`}>
               <IconCmp size={20} strokeWidth={2} />
               <span className="text-[10px] uppercase tracking-wider font-medium">{label}</span>
             </button>
@@ -1272,7 +1272,7 @@ Nutze die Vergleichsdaten aktiv für konkrete Aussagen wie "+12% Volumen beim Ba
               </div>
               <div className="flex gap-2">
                 {Array.from({ length: weekTarget }).map((_, i) => (
-                  <div key={i} className={`flex-1 h-12 rounded-xl border flex items-center justify-center ${i < weekProgress ? 'bg-emerald-100 border-emerald-400 text-emerald-900' : 'bg-white dark:bg-zinc-800 border-gray-200 dark:border-zinc-700 text-gray-300 dark:text-zinc-600'}`}>
+                  <div key={i} className={`flex-1 h-12 rounded-xl border flex items-center justify-center ${i < weekProgress ? 'bg-emerald-100 border-emerald-400 text-emerald-900' : 'bg-white dark:bg-zinc-900 dark:bg-zinc-800 border-gray-200 dark:border-zinc-700 text-gray-300 dark:text-zinc-600'}`}>
                     {i < weekProgress ? <Icon.Check size={20} strokeWidth={3} /> : <span className="font-display text-2xl">{i + 1}</span>}
                   </div>
                 ))}
@@ -1354,7 +1354,7 @@ Nutze die Vergleichsdaten aktiv für konkrete Aussagen wie "+12% Volumen beim Ba
                       <div className="font-mono-num font-bold text-3xl text-gray-900 dark:text-zinc-50">{latestBW.kg} <span className="text-sm font-normal text-gray-500 dark:text-zinc-500">kg</span></div>
                       <div className="text-[11px] text-gray-400 dark:text-zinc-500 mt-0.5">{new Date(latestBW.date).toLocaleDateString('de-DE', { weekday: 'short', day: 'numeric', month: 'long' })}</div>
                       {bwDelta !== null && (
-                        <div className={`text-xs font-mono-num mt-0.5 ${bwDelta < 0 ? 'text-emerald-600' : bwDelta > 0 ? 'text-red-400' : 'text-gray-400'}`}>
+                        <div className={`text-xs font-mono-num mt-0.5 ${bwDelta < 0 ? 'text-emerald-600' : bwDelta > 0 ? 'text-red-400' : 'text-gray-400 dark:text-zinc-500'}`}>
                           {bwDelta > 0 ? '+' : ''}{bwDelta.toFixed(1)} kg vs. letztes Mal
                         </div>
                       )}
@@ -1390,8 +1390,8 @@ Nutze die Vergleichsdaten aktiv für konkrete Aussagen wie "+12% Volumen beim Ba
                   {/* Last 3 entries */}
                   <div className="flex gap-2 mt-3">
                     {bwEntries.slice(-3).reverse().map((e, i) => (
-                      <div key={e.date} className={`flex-1 rounded-xl p-2 text-center ${i === 0 ? 'bg-emerald-50 border border-emerald-200' : 'bg-white dark:bg-zinc-800 border border-gray-200 dark:border-zinc-700'}`}>
-                        <div className={`font-mono-num font-bold text-sm ${i === 0 ? 'text-emerald-700' : 'text-gray-700'}`}>{e.kg}</div>
+                      <div key={e.date} className={`flex-1 rounded-xl p-2 text-center ${i === 0 ? 'bg-emerald-50 border border-emerald-200' : 'bg-white dark:bg-zinc-900 dark:bg-zinc-800 border border-gray-200 dark:border-zinc-700'}`}>
+                        <div className={`font-mono-num font-bold text-sm ${i === 0 ? 'text-emerald-700' : 'text-gray-700 dark:text-zinc-300'}`}>{e.kg}</div>
                         <div className="text-[9px] text-gray-400 dark:text-zinc-500 mt-0.5">{new Date(e.date).toLocaleDateString('de-DE', { day: 'numeric', month: 'short' })}</div>
                       </div>
                     ))}
@@ -1417,7 +1417,7 @@ Nutze die Vergleichsdaten aktiv für konkrete Aussagen wie "+12% Volumen beim Ba
                   const isNew = pr.date === state.workouts[state.workouts.length - 1]?.date;
                   return (
                     <div key={pr.name} className={`rounded-2xl border p-3 flex items-center gap-3 ${isNew ? 'bg-amber-50 border-amber-300' : 'bg-gray-50 dark:bg-zinc-800 border-gray-200 dark:border-zinc-700'}`}>
-                      <div className={`w-8 h-8 rounded-lg flex items-center justify-center text-sm font-display ${isNew ? 'bg-amber-200 text-amber-900' : 'bg-gray-200 dark:bg-zinc-700 text-gray-500 dark:text-zinc-400'}`}>
+                      <div className={`w-8 h-8 rounded-lg flex items-center justify-center text-sm font-display ${isNew ? 'bg-amber-200 text-amber-900' : 'bg-gray-200 dark:bg-zinc-700 text-gray-500 dark:text-zinc-500 dark:text-zinc-400'}`}>
                         {i === 0 ? '🥇' : i === 1 ? '🥈' : '🥉'}
                       </div>
                       <div className="flex-1 min-w-0">
@@ -1901,8 +1901,8 @@ Nutze die Vergleichsdaten aktiv für konkrete Aussagen wie "+12% Volumen beim Ba
                 <Icon.X size={22} />
               </button>
               <div className="flex items-center gap-2 text-sm">
-                <Icon.Clock size={14} className={timeOverBudget ? 'text-red-400' : 'text-gray-600'} />
-                <span className={`font-mono-num ${timeOverBudget ? 'text-red-400 font-bold' : 'text-gray-700'}`}>{elapsedMin} / 60 min</span>
+                <Icon.Clock size={14} className={timeOverBudget ? 'text-red-400' : 'text-gray-600 dark:text-zinc-400'} />
+                <span className={`font-mono-num ${timeOverBudget ? 'text-red-400 font-bold' : 'text-gray-700 dark:text-zinc-300'}`}>{elapsedMin} / 60 min</span>
               </div>
               <button onClick={() => finishWorkout(false)}
                 className="px-3 py-1.5 rounded-xl bg-emerald-100 text-emerald-800 text-xs font-bold active:bg-emerald-200 transition">
@@ -1925,10 +1925,10 @@ Nutze die Vergleichsdaten aktiv für konkrete Aussagen wie "+12% Volumen beim Ba
                   <button key={i} onClick={() => goToExercise(i)}
                     className={`flex-shrink-0 px-3 py-1.5 rounded-full text-xs font-medium border whitespace-nowrap transition ${
                       active   ? 'bg-emerald-100 border-emerald-400 text-emerald-900'
-                      : done   ? 'bg-gray-50 border-gray-300 text-gray-600 line-through'
+                      : done   ? 'bg-gray-50 dark:bg-zinc-800 border-gray-300 dark:border-zinc-600 text-gray-600 dark:text-zinc-400 line-through'
                       : skipped? 'bg-amber-50 border-amber-300 text-amber-600'
-                      : partial ? 'bg-gray-50 border-emerald-300 text-gray-800'
-                      : 'bg-gray-50 dark:bg-zinc-800 border-gray-200 dark:border-zinc-700 text-gray-500 dark:text-zinc-400'
+                      : partial ? 'bg-gray-50 dark:bg-zinc-800 border-emerald-300 text-gray-800 dark:text-zinc-100'
+                      : 'bg-gray-50 dark:bg-zinc-800 border-gray-200 dark:border-zinc-700 text-gray-500 dark:text-zinc-500 dark:text-zinc-400'
                     }`}>
                     {i + 1}. {ex.name.split(' ')[0]}{skipped ? ' ↷' : ''}
                   </button>
@@ -1957,7 +1957,7 @@ Nutze die Vergleichsdaten aktiv für konkrete Aussagen wie "+12% Volumen beim Ba
               className={`mt-3 inline-flex items-center gap-2 px-3 py-1.5 rounded-full border text-xs font-medium transition ${
                 currentExercise.useBarbell
                   ? 'bg-emerald-50 border-emerald-300 text-emerald-700'
-                  : 'bg-gray-50 dark:bg-zinc-800 border-gray-200 dark:border-zinc-700 text-gray-500 dark:text-zinc-400'
+                  : 'bg-gray-50 dark:bg-zinc-800 border-gray-200 dark:border-zinc-700 text-gray-500 dark:text-zinc-500 dark:text-zinc-400'
               }`}>
               <div className={`w-4 h-4 rounded border-[1.5px] flex items-center justify-center transition ${
                 currentExercise.useBarbell ? 'bg-emerald-100 border-emerald-400' : 'border-gray-400'
@@ -1975,9 +1975,9 @@ Nutze die Vergleichsdaten aktiv für konkrete Aussagen wie "+12% Volumen beim Ba
               const isCurrent = i === setNumber && !isDone;
               return (
                 <button key={i} onClick={() => s && openSetEditor(exIndex, i)} className={`flex-1 h-14 rounded-xl border flex flex-col items-center justify-center transition active:scale-95 ${
-                  s ? (s.warmup ? 'bg-gray-100 border-gray-300 text-gray-500 cursor-pointer hover:bg-gray-200' : 'bg-emerald-50 border-emerald-300 text-emerald-700 cursor-pointer hover:bg-emerald-100')
-                  : isCurrent ? 'bg-gray-50 border-emerald-400 text-gray-900'
-                  : 'bg-gray-50 border-gray-200 text-gray-400'
+                  s ? (s.warmup ? 'bg-gray-100 dark:bg-zinc-700 border-gray-300 dark:border-zinc-600 text-gray-500 dark:text-zinc-500 cursor-pointer hover:bg-gray-200 dark:hover:bg-zinc-600' : 'bg-emerald-50 border-emerald-300 text-emerald-700 cursor-pointer hover:bg-emerald-100')
+                  : isCurrent ? 'bg-gray-50 dark:bg-zinc-800 border-emerald-400 text-gray-900 dark:text-zinc-50'
+                  : 'bg-gray-50 dark:bg-zinc-800 border-gray-200 dark:border-zinc-700 text-gray-400 dark:text-zinc-500'
                 }`}>
                   <div className="text-[10px] uppercase tracking-wider opacity-70">{isCardio ? 'Einheit' : 'Satz'} {i + 1}</div>
                   {s ? <div className="font-mono-num text-sm font-bold">
@@ -2086,7 +2086,7 @@ Nutze die Vergleichsdaten aktiv für konkrete Aussagen wie "+12% Volumen beim Ba
                     className={`w-full py-2.5 rounded-xl text-sm font-medium flex items-center justify-center gap-2 transition ${
                       currentExercise.weightUp
                         ? 'bg-amber-100 text-amber-800 border border-amber-300'
-                        : 'bg-gray-100 text-gray-500 border border-gray-200'
+                        : 'bg-gray-100 dark:bg-zinc-700 text-gray-500 dark:text-zinc-500 border border-gray-200 dark:border-zinc-700'
                     }`}
                   >
                     <Icon.TrendingUp size={16} strokeWidth={2.5} />
@@ -2134,7 +2134,7 @@ Nutze die Vergleichsdaten aktiv für konkrete Aussagen wie "+12% Volumen beim Ba
                     </>
                   )}
                   {!isCardio && (
-                    <button onClick={() => setIsWarmup(!isWarmup)} className={`mt-3 w-full py-2.5 rounded-xl border text-sm font-medium flex items-center justify-center gap-2 transition ${isWarmup ? 'bg-amber-50 border-amber-300 text-amber-700' : 'bg-gray-50 dark:bg-zinc-800 border-gray-200 dark:border-zinc-700 text-gray-500 dark:text-zinc-400'}`}>
+                    <button onClick={() => setIsWarmup(!isWarmup)} className={`mt-3 w-full py-2.5 rounded-xl border text-sm font-medium flex items-center justify-center gap-2 transition ${isWarmup ? 'bg-amber-50 border-amber-300 text-amber-700' : 'bg-gray-50 dark:bg-zinc-800 border-gray-200 dark:border-zinc-700 text-gray-500 dark:text-zinc-500 dark:text-zinc-400'}`}>
                       <div className={`w-4 h-4 rounded border flex items-center justify-center transition ${isWarmup ? 'bg-amber-400 border-amber-400' : 'border-gray-400'}`}>
                         {isWarmup && <Icon.Check size={10} strokeWidth={3} className="text-white" />}
                       </div>
@@ -2409,7 +2409,7 @@ Nutze die Vergleichsdaten aktiv für konkrete Aussagen wie "+12% Volumen beim Ba
                           className={`w-full text-left p-3 rounded-xl border flex items-center gap-3 transition ${
                             isCurrent
                               ? 'bg-emerald-50 border-emerald-200 cursor-default opacity-50'
-                              : 'bg-white border-gray-200 active:bg-emerald-50 active:border-emerald-300'
+                              : 'bg-white dark:bg-zinc-900 border-gray-200 dark:border-zinc-700 active:bg-emerald-50 active:border-emerald-300'
                           }`}>
                           <div className="flex-1 min-w-0">
                             <div className="font-medium text-gray-900 dark:text-zinc-50 text-sm">{ex.name}</div>
@@ -2731,7 +2731,7 @@ Nutze die Vergleichsdaten aktiv für konkrete Aussagen wie "+12% Volumen beim Ba
                   </div>
                   {!isCardio && (
                     <button onClick={() => setEditSetModal({ ...editSetModal, warmup: !editSetModal.warmup })}
-                      className={`w-full py-2.5 rounded-xl border text-sm font-medium flex items-center justify-center gap-2 mb-4 transition ${editSetModal.warmup ? 'bg-amber-50 border-amber-300 text-amber-700' : 'bg-gray-50 dark:bg-zinc-800 border-gray-200 dark:border-zinc-700 text-gray-500 dark:text-zinc-400'}`}>
+                      className={`w-full py-2.5 rounded-xl border text-sm font-medium flex items-center justify-center gap-2 mb-4 transition ${editSetModal.warmup ? 'bg-amber-50 border-amber-300 text-amber-700' : 'bg-gray-50 dark:bg-zinc-800 border-gray-200 dark:border-zinc-700 text-gray-500 dark:text-zinc-500 dark:text-zinc-400'}`}>
                       <div className={`w-4 h-4 rounded border flex items-center justify-center transition ${editSetModal.warmup ? 'bg-amber-400 border-amber-400' : 'border-gray-400'}`}>
                         {editSetModal.warmup && <Icon.Check size={10} strokeWidth={3} className="text-white" />}
                       </div>
@@ -2943,9 +2943,9 @@ Nutze die Vergleichsdaten aktiv für konkrete Aussagen wie "+12% Volumen beim Ba
                   className={"flex-shrink-0 px-3.5 py-2 rounded-full text-xs font-semibold border whitespace-nowrap transition active:scale-95 " + (
                     selectedEx === name
                       ? 'bg-emerald-600 border-emerald-600 text-white shadow-sm'
-                      : 'bg-white border-gray-200 text-gray-600 hover:bg-gray-50'
+                      : 'bg-white dark:bg-zinc-900 border-gray-200 dark:border-zinc-700 text-gray-600 dark:text-zinc-400 hover:bg-gray-50 dark:hover:bg-zinc-800'
                   )}>
-                  {name} <span className={"opacity-70 font-mono-num " + (selectedEx === name ? 'text-emerald-100' : 'text-gray-400')}>·{exStats[name].count}</span>
+                  {name} <span className={"opacity-70 font-mono-num " + (selectedEx === name ? 'text-emerald-100' : 'text-gray-400 dark:text-zinc-500')}>·{exStats[name].count}</span>
                 </button>
               ))}
             </div>
@@ -3063,7 +3063,7 @@ Nutze die Vergleichsdaten aktiv für konkrete Aussagen wie "+12% Volumen beim Ba
               <div className="px-5 mt-5">
                 <div className="flex items-baseline justify-between mb-2 px-1">
                   <div className="text-xs uppercase tracking-[0.25em] text-gray-500 dark:text-zinc-500">Körpergewicht</div>
-                  <div className={`text-xs font-mono-num font-bold ${parseFloat(delta) < 0 ? 'text-emerald-600' : parseFloat(delta) > 0 ? 'text-red-400' : 'text-gray-400'}`}>
+                  <div className={`text-xs font-mono-num font-bold ${parseFloat(delta) < 0 ? 'text-emerald-600' : parseFloat(delta) > 0 ? 'text-red-400' : 'text-gray-400 dark:text-zinc-500'}`}>
                     {parseFloat(delta) > 0 ? '+' : ''}{delta} kg gesamt
                   </div>
                 </div>
@@ -3306,13 +3306,13 @@ Nutze die Vergleichsdaten aktiv für konkrete Aussagen wie "+12% Volumen beim Ba
         positive: 'bg-emerald-50 border-emerald-300 text-emerald-800',
         warning: 'bg-amber-50 border-amber-300 text-amber-800',
         negative: 'bg-red-50 border-red-300 text-red-800',
-        info: 'bg-gray-50 border-gray-300 text-gray-800',
+        info: 'bg-gray-50 dark:bg-zinc-800 border-gray-300 dark:border-zinc-600 text-gray-800 dark:text-zinc-100',
       };
       const iconColors = {
         positive: 'text-emerald-600',
         warning: 'text-amber-600',
         negative: 'text-red-600',
-        info: 'text-gray-500',
+        info: 'text-gray-500 dark:text-zinc-500',
       };
       const IconCmp = Icon[icon] || Icon.Activity;
       return (
@@ -3458,7 +3458,7 @@ Nutze die Vergleichsdaten aktiv für konkrete Aussagen wie "+12% Volumen beim Ba
               <div className="font-display text-xl text-gray-900 dark:text-zinc-50 leading-none mt-0.5">{current.name.toUpperCase()}</div>
             </div>
             <button onClick={() => canSave && onSave(exercises)} disabled={!canSave}
-              className={`px-3 py-1.5 rounded-lg text-sm font-bold ${canSave ? 'bg-emerald-100 text-emerald-900' : 'bg-gray-100 text-gray-400'}`}>
+              className={`px-3 py-1.5 rounded-lg text-sm font-bold ${canSave ? 'bg-emerald-100 text-emerald-900' : 'bg-gray-100 dark:bg-zinc-700 text-gray-400 dark:text-zinc-500'}`}>
               Speichern
             </button>
           </div>
@@ -3484,15 +3484,15 @@ Nutze die Vergleichsdaten aktiv für konkrete Aussagen wie "+12% Volumen beim Ba
             {exercises.map((ex, i) => {
               const isOpen = editingIndex === i;
               return (
-                <div key={i} className={`rounded-2xl border overflow-hidden ${isOpen ? 'bg-gray-50 border-emerald-300' : 'bg-gray-50 dark:bg-zinc-800 border-gray-200 dark:border-zinc-700'}`}>
+                <div key={i} className={`rounded-2xl border overflow-hidden ${isOpen ? 'bg-gray-50 dark:bg-zinc-800 border-emerald-300' : 'bg-gray-50 dark:bg-zinc-800 border-gray-200 dark:border-zinc-700'}`}>
                   <div className="p-3 flex items-center gap-2">
                     <div className="flex flex-col gap-0.5">
                       <button onClick={() => moveEx(i, -1)} disabled={i === 0}
-                        className={`w-7 h-6 rounded flex items-center justify-center ${i === 0 ? 'text-gray-300' : 'text-gray-600 bg-gray-100 active:bg-zinc-700'}`}>
+                        className={`w-7 h-6 rounded flex items-center justify-center ${i === 0 ? 'text-gray-300 dark:text-zinc-600' : 'text-gray-600 dark:text-zinc-400 bg-gray-100 dark:bg-zinc-700 active:bg-zinc-700'}`}>
                         <Icon.ChevronUp size={14} strokeWidth={3} />
                       </button>
                       <button onClick={() => moveEx(i, 1)} disabled={i === exercises.length - 1}
-                        className={`w-7 h-6 rounded flex items-center justify-center ${i === exercises.length - 1 ? 'text-gray-300' : 'text-gray-600 bg-gray-100 active:bg-zinc-700'}`}>
+                        className={`w-7 h-6 rounded flex items-center justify-center ${i === exercises.length - 1 ? 'text-gray-300 dark:text-zinc-600' : 'text-gray-600 dark:text-zinc-400 bg-gray-100 dark:bg-zinc-700 active:bg-zinc-700'}`}>
                         <Icon.ChevronDown size={14} strokeWidth={3} />
                       </button>
                     </div>
@@ -3524,7 +3524,7 @@ Nutze die Vergleichsdaten aktiv für konkrete Aussagen wie "+12% Volumen beim Ba
                       </div>
                       <div className="flex items-center gap-2">
                         <button onClick={() => updateEx(i, { cardio: !ex.cardio })}
-                          className={`px-3 py-1.5 rounded-lg text-xs font-medium border transition ${ex.cardio ? 'bg-blue-50 border-blue-300 text-blue-700' : 'bg-gray-100 border-gray-200 text-gray-500'}`}>
+                          className={`px-3 py-1.5 rounded-lg text-xs font-medium border transition ${ex.cardio ? 'bg-blue-50 border-blue-300 text-blue-700' : 'bg-gray-100 dark:bg-zinc-700 border-gray-200 dark:border-zinc-700 text-gray-500 dark:text-zinc-500'}`}>
                           {ex.cardio ? '🔥 Cardio' : '💪 Kraft'}
                         </button>
                       </div>
@@ -3671,7 +3671,7 @@ Nutze die Vergleichsdaten aktiv für konkrete Aussagen wie "+12% Volumen beim Ba
               <div className="font-display text-xl text-gray-900 dark:text-zinc-50 leading-none mt-0.5">{planName || '...'}</div>
             </div>
             <button onClick={handleSave} disabled={!canSave}
-              className={`px-3 py-1.5 rounded-lg text-sm font-bold transition ${canSave ? 'bg-emerald-500 text-white' : 'bg-gray-200 text-gray-400'}`}>
+              className={`px-3 py-1.5 rounded-lg text-sm font-bold transition ${canSave ? 'bg-emerald-500 text-white' : 'bg-gray-200 dark:bg-zinc-700 text-gray-400 dark:text-zinc-500'}`}>
               Speichern
             </button>
           </div>
@@ -3691,7 +3691,7 @@ Nutze die Vergleichsdaten aktiv für konkrete Aussagen wie "+12% Volumen beim Ba
               <div className="flex gap-2">
                 {[2, 3, 4, 5].map((n) => (
                   <button key={n} onClick={() => updateDaysPerWeek(n)}
-                    className={`flex-1 py-2.5 rounded-xl border font-bold text-sm ${daysPerWeek === n ? 'bg-emerald-100 border-emerald-400 text-emerald-900' : 'bg-gray-50 border-gray-200 text-gray-700'}`}>
+                    className={`flex-1 py-2.5 rounded-xl border font-bold text-sm ${daysPerWeek === n ? 'bg-emerald-100 border-emerald-400 text-emerald-900' : 'bg-gray-50 dark:bg-zinc-800 border-gray-200 dark:border-zinc-700 text-gray-700 dark:text-zinc-300'}`}>
                     {n}×
                   </button>
                 ))}
@@ -3733,15 +3733,15 @@ Nutze die Vergleichsdaten aktiv für konkrete Aussagen wie "+12% Volumen beim Ba
                 {days[activeDayIdx].exercises.map((ex, exIdx) => {
                   const isOpen = expandedEx === exIdx;
                   return (
-                    <div key={exIdx} className={`rounded-2xl border overflow-hidden ${isOpen ? 'border-emerald-300 bg-white' : 'border-gray-200 bg-gray-50'}`}>
+                    <div key={exIdx} className={`rounded-2xl border overflow-hidden ${isOpen ? 'border-emerald-300 bg-white dark:bg-zinc-900' : 'border-gray-200 dark:border-zinc-700 bg-gray-50 dark:bg-zinc-800'}`}>
                       <div className="p-3 flex items-center gap-2">
                         <div className="flex flex-col gap-0.5">
                           <button onClick={() => moveEx(exIdx, -1)} disabled={exIdx === 0}
-                            className={`w-7 h-6 rounded flex items-center justify-center ${exIdx === 0 ? 'text-gray-300' : 'text-gray-500 bg-gray-200 active:bg-gray-300'}`}>
+                            className={`w-7 h-6 rounded flex items-center justify-center ${exIdx === 0 ? 'text-gray-300 dark:text-zinc-600' : 'text-gray-500 dark:text-zinc-500 bg-gray-200 dark:bg-zinc-700 active:bg-gray-300'}`}>
                             <Icon.ChevronUp size={13} strokeWidth={3} />
                           </button>
                           <button onClick={() => moveEx(exIdx, 1)} disabled={exIdx === days[activeDayIdx].exercises.length - 1}
-                            className={`w-7 h-6 rounded flex items-center justify-center ${exIdx === days[activeDayIdx].exercises.length - 1 ? 'text-gray-300' : 'text-gray-500 bg-gray-200 active:bg-gray-300'}`}>
+                            className={`w-7 h-6 rounded flex items-center justify-center ${exIdx === days[activeDayIdx].exercises.length - 1 ? 'text-gray-300 dark:text-zinc-600' : 'text-gray-500 dark:text-zinc-500 bg-gray-200 dark:bg-zinc-700 active:bg-gray-300'}`}>
                             <Icon.ChevronDown size={13} strokeWidth={3} />
                           </button>
                         </div>
@@ -3820,7 +3820,7 @@ Nutze die Vergleichsdaten aktiv für konkrete Aussagen wie "+12% Volumen beim Ba
                       const alreadyAdded = days[activeDayIdx].exercises.some((e) => e.name === ex.name);
                       return (
                         <button key={ex.name} onClick={() => { if (!alreadyAdded) addExFromLibrary(ex); }}
-                          className={`w-full text-left p-3 rounded-xl border flex items-center gap-3 transition ${alreadyAdded ? 'bg-gray-50 border-gray-100 opacity-40' : 'bg-white border-gray-200 active:bg-emerald-50 active:border-emerald-300'}`}>
+                          className={`w-full text-left p-3 rounded-xl border flex items-center gap-3 transition ${alreadyAdded ? 'bg-gray-50 dark:bg-zinc-800 border-gray-100 dark:border-zinc-800 opacity-40' : 'bg-white dark:bg-zinc-900 border-gray-200 dark:border-zinc-700 active:bg-emerald-50 active:border-emerald-300'}`}>
                           <div className="flex-1 min-w-0">
                             <div className="font-medium text-gray-900 dark:text-zinc-50 text-sm">{ex.name}</div>
                             <div className="text-[10px] text-gray-500 dark:text-zinc-500">{ex.focus} · {ex.sets}×{ex.repRange[0]}–{ex.repRange[1]}</div>
@@ -4033,7 +4033,7 @@ with check (true);`}</pre>
             <div className="text-sm font-semibold text-gray-900 dark:text-zinc-50 text-left">{isDark ? '🌙 Dark Mode aktiv' : '☀️ Light Mode aktiv'}</div>
             <div className="text-xs text-gray-500 dark:text-zinc-500 mt-0.5 text-left">Tippen zum Umschalten</div>
           </div>
-          <div className={`w-12 h-7 rounded-full transition relative flex-shrink-0 ${isDark ? 'bg-emerald-500' : 'bg-gray-200'}`}>
+          <div className={`w-12 h-7 rounded-full transition relative flex-shrink-0 ${isDark ? 'bg-emerald-500' : 'bg-gray-200 dark:bg-zinc-700'}`}>
             <div className={`w-5 h-5 rounded-full bg-white absolute top-1 transition ${isDark ? 'left-6' : 'left-1'}`} />
           </div>
         </button>
@@ -4135,12 +4135,12 @@ with check (true);`}</pre>
                   const active = state.profile.plan === key;
                   return (
                     <button key={key} onClick={() => setPlan(key)}
-                      className={`w-full text-left p-4 rounded-2xl border transition ${active ? 'bg-emerald-100 border-emerald-400 text-emerald-900' : 'bg-gray-50 border-gray-200 text-gray-800'}`}>
+                      className={`w-full text-left p-4 rounded-2xl border transition ${active ? 'bg-emerald-100 border-emerald-400 text-emerald-900' : 'bg-gray-50 dark:bg-zinc-800 border-gray-200 dark:border-zinc-700 text-gray-800 dark:text-zinc-100'}`}>
                       <div className="flex items-center justify-between">
                         <div className="font-semibold">{def.label}</div>
                         {active && <Icon.Check size={20} strokeWidth={3} />}
                       </div>
-                      <div className={`text-xs mt-0.5 ${active ? 'text-emerald-900/70' : 'text-gray-500'}`}>{def.desc}</div>
+                      <div className={`text-xs mt-0.5 ${active ? 'text-emerald-900/70' : 'text-gray-500 dark:text-zinc-500'}`}>{def.desc}</div>
                     </button>
                   );
                 })}
@@ -4154,10 +4154,10 @@ with check (true);`}</pre>
                         <div key={key} className={`flex items-center gap-2 rounded-2xl border ${active ? 'bg-emerald-100 border-emerald-400' : 'bg-gray-50 dark:bg-zinc-800 border-gray-200 dark:border-zinc-700'}`}>
                           <button onClick={() => setPlan(key)} className="flex-1 text-left p-4">
                             <div className="flex items-center justify-between">
-                              <div className={`font-semibold ${active ? 'text-emerald-900' : 'text-gray-800'}`}>{def.label}</div>
+                              <div className={`font-semibold ${active ? 'text-emerald-900' : 'text-gray-800 dark:text-zinc-100'}`}>{def.label}</div>
                               {active && <Icon.Check size={18} strokeWidth={3} className="text-emerald-700" />}
                             </div>
-                            <div className={`text-xs mt-0.5 ${active ? 'text-emerald-900/70' : 'text-gray-500'}`}>{def.daysPerWeek}× pro Woche · {def.days.length} Workout-{def.days.length === 1 ? 'Tag' : 'Tage'}</div>
+                            <div className={`text-xs mt-0.5 ${active ? 'text-emerald-900/70' : 'text-gray-500 dark:text-zinc-500'}`}>{def.daysPerWeek}× pro Woche · {def.days.length} Workout-{def.days.length === 1 ? 'Tag' : 'Tage'}</div>
                           </button>
                           <button onClick={() => setPlanCreator(key)} className="pr-4 text-gray-400 dark:text-zinc-500 hover:text-emerald-700">
                             <Icon.Edit3 size={16} />
@@ -4178,7 +4178,7 @@ with check (true);`}</pre>
               <div className="grid grid-cols-4 gap-2">
                 {[60, 90, 120, 180].map((s) => (
                   <button key={s} onClick={() => setRest(s)}
-                    className={`py-3 rounded-xl border font-bold ${state.profile.restSeconds === s ? 'bg-emerald-100 border-emerald-400 text-emerald-900' : 'bg-gray-50 border-gray-200 text-gray-700'}`}>
+                    className={`py-3 rounded-xl border font-bold ${state.profile.restSeconds === s ? 'bg-emerald-100 border-emerald-400 text-emerald-900' : 'bg-gray-50 dark:bg-zinc-800 border-gray-200 dark:border-zinc-700 text-gray-700 dark:text-zinc-300'}`}>
                     {s}s
                   </button>
                 ))}
@@ -4202,10 +4202,10 @@ with check (true);`}</pre>
                 </div>
                 <button
                   onClick={() => persist({ ...state, deloadMode: !state.deloadMode })}
-                  className={`w-full p-4 rounded-2xl border transition flex items-center justify-between ${state.deloadMode ? 'bg-amber-50 dark:bg-amber-950 border-amber-300 dark:border-amber-700 text-amber-900 dark:text-amber-200' : 'bg-gray-50 dark:bg-zinc-800 border-gray-200 dark:border-zinc-700 text-gray-800 dark:text-zinc-200'}`}>
+                  className={`w-full p-4 rounded-2xl border transition flex items-center justify-between ${state.deloadMode ? 'bg-amber-50 dark:bg-amber-950 border-amber-300 dark:border-amber-700 text-amber-900 dark:text-amber-200' : 'bg-gray-50 dark:bg-zinc-800 border-gray-200 dark:border-zinc-700 text-gray-800 dark:text-zinc-100 dark:text-zinc-200'}`}>
                   <div>
                     <div className="font-semibold text-sm">Deload-Modus</div>
-                    <div className={`text-xs mt-0.5 ${state.deloadMode ? 'text-amber-800/70 dark:text-amber-300/70' : 'text-gray-500 dark:text-zinc-400'}`}>-20% Gewicht · halbe XP</div>
+                    <div className={`text-xs mt-0.5 ${state.deloadMode ? 'text-amber-800/70 dark:text-amber-300/70' : 'text-gray-500 dark:text-zinc-500 dark:text-zinc-400'}`}>-20% Gewicht · halbe XP</div>
                   </div>
                   {state.deloadMode && <Icon.Check size={20} strokeWidth={3} className="text-amber-700 dark:text-amber-400" />}
                 </button>
@@ -4565,7 +4565,7 @@ with check (true);`}</pre>
                 <div className="flex gap-2">
                   {Object.entries(TYPES).map(([k, v]) => (
                     <button key={k} onClick={() => setActType(k)}
-                      className={`flex-1 flex items-center justify-center gap-2 py-3 rounded-2xl border font-semibold text-sm transition ${actType === k ? 'bg-gray-900 border-gray-900 text-white' : 'bg-gray-50 border-gray-200 text-gray-700'}`}>
+                      className={`flex-1 flex items-center justify-center gap-2 py-3 rounded-2xl border font-semibold text-sm transition ${actType === k ? 'bg-gray-900 border-gray-900 text-white' : 'bg-gray-50 dark:bg-zinc-800 border-gray-200 dark:border-zinc-700 text-gray-700 dark:text-zinc-300'}`}>
                       <span>{v.emoji}</span>{v.label}
                     </button>
                   ))}
@@ -4788,7 +4788,7 @@ with check (true);`}</pre>
             syncStatus === 'syncing' ? 'bg-amber-100 text-amber-700'
             : syncStatus === 'ok'   ? 'bg-emerald-100 text-emerald-700'
             : syncStatus === 'error'? 'bg-red-100 text-red-600'
-            : 'bg-gray-100 text-gray-500'
+            : 'bg-gray-100 dark:bg-zinc-700 text-gray-500 dark:text-zinc-500'
           }`} style={{ marginTop: 'env(safe-area-inset-top)' }}>
             {syncStatus === 'syncing' && '⟳ Syncing…'}
             {syncStatus === 'ok'      && '✓ Synced'}
