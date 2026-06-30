@@ -931,10 +931,10 @@
         { key: 'settings',  label: 'Setup',      icon: Icon.Settings },
       ];
       return (
-        <div className="fixed bottom-0 inset-x-0 bg-white/90 backdrop-blur border-t border-gray-200 dark:border-zinc-700 px-3 pt-2 fixed-bottom-nav flex z-30">
+        <div className="fixed bottom-0 inset-x-0 bg-white/90 dark:bg-zinc-900/90 backdrop-blur border-t border-gray-200 dark:border-zinc-700 px-3 pt-2 fixed-bottom-nav flex z-30">
           {items.map(({ key, label, icon: IconCmp, disabled }) => (
             <button key={key} onClick={() => !disabled && setView(key)} disabled={disabled}
-              className={`flex-1 flex flex-col items-center gap-0.5 py-2 ${active === key ? 'text-emerald-700' : disabled ? 'text-gray-300' : 'text-gray-500'}`}>
+              className={`flex-1 flex flex-col items-center gap-0.5 py-2 ${active === key ? 'text-emerald-700 dark:text-emerald-400' : disabled ? 'text-gray-300 dark:text-zinc-600' : 'text-gray-500 dark:text-zinc-400'}`}>
               <IconCmp size={20} strokeWidth={2} />
               <span className="text-[10px] uppercase tracking-wider font-medium">{label}</span>
             </button>
@@ -1241,7 +1241,7 @@ Nutze die Vergleichsdaten aktiv für konkrete Aussagen wie "+12% Volumen beim Ba
                 </div>
               )}
             </div>
-            <button onClick={() => setView('settings')} className="text-gray-500 dark:text-zinc-500 hover:text-gray-800 dark:text-zinc-100 transition p-2 -mr-2">
+            <button onClick={() => setView('settings')} className="text-gray-500 dark:text-zinc-500 hover:text-gray-800 dark:hover:text-zinc-100 transition p-2 -mr-2">
               <Icon.Settings size={22} />
             </button>
           </div>
@@ -1286,7 +1286,7 @@ Nutze die Vergleichsdaten aktiv für konkrete Aussagen wie "+12% Volumen beim Ba
               {planDays.map((tmpl, idx) => {
                 const est = estimateWorkoutMinutes(tmpl, state.profile.restSeconds);
                 return (
-                  <div key={idx} className="rounded-2xl bg-gray-50 dark:bg-zinc-800 border border-gray-200 dark:border-zinc-700 p-4 active:bg-emerald-50 dark:bg-emerald-950 transition">
+                  <div key={idx} className="rounded-2xl bg-gray-50 dark:bg-zinc-800 border border-gray-200 dark:border-zinc-700 p-4 active:bg-emerald-50 dark:active:bg-emerald-950 transition">
                     <div className="flex items-center justify-between">
                       <div className="flex items-center gap-3 min-w-0">
                         <div className="w-10 h-10 rounded-xl bg-emerald-100 flex items-center justify-center font-display text-lg text-emerald-700 flex-shrink-0">{tmpl.code}</div>
@@ -1317,7 +1317,7 @@ Nutze die Vergleichsdaten aktiv für konkrete Aussagen wie "+12% Volumen beim Ba
           {state.workouts.length >= 3 && (
             <div className="px-5 mt-4">
               <button onClick={() => setView('insights')}
-                className="w-full rounded-2xl bg-gray-50 dark:bg-zinc-800 border border-gray-200 dark:border-zinc-700 p-4 flex items-center gap-3 active:bg-gray-100 dark:bg-zinc-700 transition text-left">
+                className="w-full rounded-2xl bg-gray-50 dark:bg-zinc-800 border border-gray-200 dark:border-zinc-700 p-4 flex items-center gap-3 active:bg-gray-100 dark:active:bg-zinc-700 transition text-left">
                 <div className="w-10 h-10 rounded-xl bg-emerald-100 flex items-center justify-center text-emerald-700">
                   <Icon.Activity size={20} strokeWidth={2} />
                 </div>
@@ -1449,7 +1449,7 @@ Nutze die Vergleichsdaten aktiv für konkrete Aussagen wie "+12% Volumen beim Ba
                 </div>
                 <div className="flex items-center gap-2 mb-5">
                   <button onClick={() => setBwInput(v => String(Math.max(0, (parseFloat(v.replace(',','.')) || 0) - 0.1).toFixed(1)))}
-                    className="w-12 h-12 rounded-xl bg-gray-100 dark:bg-zinc-700 flex items-center justify-center text-gray-700 dark:text-zinc-300 active:bg-gray-200 text-xl font-bold">−</button>
+                    className="w-12 h-12 rounded-xl bg-gray-100 dark:bg-zinc-700 flex items-center justify-center text-gray-700 dark:text-zinc-300 active:bg-gray-200 dark:active:bg-zinc-700 text-xl font-bold">−</button>
                   <input
                     type="number" inputMode="decimal" value={bwInput}
                     onChange={e => setBwInput(e.target.value)}
@@ -1458,14 +1458,14 @@ Nutze die Vergleichsdaten aktiv für konkrete Aussagen wie "+12% Volumen beim Ba
                     autoFocus
                   />
                   <button onClick={() => setBwInput(v => String(((parseFloat(v.replace(',','.')) || 0) + 0.1).toFixed(1)))}
-                    className="w-12 h-12 rounded-xl bg-gray-100 dark:bg-zinc-700 flex items-center justify-center text-gray-700 dark:text-zinc-300 active:bg-gray-200 text-xl font-bold">+</button>
+                    className="w-12 h-12 rounded-xl bg-gray-100 dark:bg-zinc-700 flex items-center justify-center text-gray-700 dark:text-zinc-300 active:bg-gray-200 dark:active:bg-zinc-700 text-xl font-bold">+</button>
                 </div>
                 <div className="text-center text-xs text-gray-400 dark:text-zinc-500 mb-4">kg · 0.1er Schritte oder direkt eintippen</div>
                 <div className="flex gap-2">
                   <button onClick={() => { setShowBWInput(false); setBwInput(''); }}
                     className="flex-1 py-3 rounded-xl bg-gray-100 dark:bg-zinc-700 text-gray-700 dark:text-zinc-300 font-medium">Abbrechen</button>
                   <button onClick={logBodyWeight} disabled={!bwInput}
-                    className="flex-1 py-3 rounded-xl bg-emerald-500 disabled:bg-gray-200 text-white disabled:text-gray-400 dark:text-zinc-500 font-bold">Speichern</button>
+                    className="flex-1 py-3 rounded-xl bg-emerald-500 disabled:bg-gray-200 dark:bg-zinc-700 text-white disabled:text-gray-400 dark:text-zinc-500 font-bold">Speichern</button>
                 </div>
               </div>
             </div>
@@ -1568,7 +1568,7 @@ Nutze die Vergleichsdaten aktiv für konkrete Aussagen wie "+12% Volumen beim Ba
                       : null;
                     return (
                       <div key={a.id} className={`rounded-2xl p-4 flex items-center gap-3 border ${isRun ? 'bg-orange-50 border-orange-200' : 'bg-lime-50 border-lime-200'}`}>
-                        <div className={`w-12 h-12 rounded-xl bg-white/70 flex items-center justify-center flex-shrink-0 ${isRun ? 'text-orange-600' : 'text-lime-700'}`}>
+                        <div className={`w-12 h-12 rounded-xl bg-white/70 dark:bg-zinc-800/70 flex items-center justify-center flex-shrink-0 ${isRun ? 'text-orange-600' : 'text-lime-700'}`}>
                           {isRun ? <Icon.Footprints size={22} strokeWidth={1.8} /> : <Icon.Tennis size={22} strokeWidth={1.8} />}
                         </div>
                         <div className="flex-1 min-w-0">
@@ -1895,9 +1895,9 @@ Nutze die Vergleichsdaten aktiv für konkrete Aussagen wie "+12% Volumen beim Ba
 
       return (
         <div className="min-h-screen pb-32 relative grain">
-          <div className="sticky top-0 z-10 bg-white/90 backdrop-blur border-b border-gray-200 dark:border-zinc-700" style={{ paddingTop: 'env(safe-area-inset-top)' }}>
+          <div className="sticky top-0 z-10 bg-white/90 dark:bg-zinc-900/90 backdrop-blur border-b border-gray-200 dark:border-zinc-700" style={{ paddingTop: 'env(safe-area-inset-top)' }}>
             <div className="px-4 py-3 flex items-center justify-between">
-              <button onClick={() => setConfirmAbort(true)} className="text-gray-500 dark:text-zinc-500 hover:text-gray-800 dark:text-zinc-100 p-1">
+              <button onClick={() => setConfirmAbort(true)} className="text-gray-500 dark:text-zinc-500 hover:text-gray-800 dark:hover:text-zinc-100 p-1">
                 <Icon.X size={22} />
               </button>
               <div className="flex items-center gap-2 text-sm">
@@ -2158,7 +2158,7 @@ Nutze die Vergleichsdaten aktiv für konkrete Aussagen wie "+12% Volumen beim Ba
                         setReps(last.reps);
                         setIsWarmup(last.warmup || false);
                       }}
-                        className="mt-2 w-full py-2.5 rounded-xl border border-gray-200 dark:border-zinc-700 bg-gray-50 dark:bg-zinc-800 text-gray-600 dark:text-zinc-400 text-xs font-medium flex items-center justify-center gap-1.5 active:bg-gray-100 dark:bg-zinc-700 transition">
+                        className="mt-2 w-full py-2.5 rounded-xl border border-gray-200 dark:border-zinc-700 bg-gray-50 dark:bg-zinc-800 text-gray-600 dark:text-zinc-400 text-xs font-medium flex items-center justify-center gap-1.5 active:bg-gray-100 dark:active:bg-zinc-700 transition">
                         <Icon.RotateCcw size={13} strokeWidth={2.5} />
                         Letzten Satz wiederholen
                         <span className="font-mono-num text-gray-400 dark:text-zinc-500 ml-1">
@@ -2195,7 +2195,7 @@ Nutze die Vergleichsdaten aktiv für konkrete Aussagen wie "+12% Volumen beim Ba
 
           {totalSetsDone > 0 && !allExercisesDone && (
             <div className="px-4 mt-3">
-              <button onClick={() => finishWorkout(false)} className="w-full text-xs text-gray-500 dark:text-zinc-500 hover:text-gray-700 dark:text-zinc-300 py-2">
+              <button onClick={() => finishWorkout(false)} className="w-full text-xs text-gray-500 dark:text-zinc-500 hover:text-gray-700 dark:hover:text-zinc-300 py-2">
                 Training früher beenden
               </button>
             </div>
@@ -2222,7 +2222,7 @@ Nutze die Vergleichsdaten aktiv für konkrete Aussagen wie "+12% Volumen beim Ba
 
           <div className="px-4 mt-1 mb-4">
             <button onClick={() => { setAddFilter('Alle'); setAddSearch(''); setShowAddExercise(true); }}
-              className="w-full py-2.5 rounded-xl border border-dashed border-gray-300 text-gray-500 dark:text-zinc-500 text-xs font-medium flex items-center justify-center gap-1.5 hover:border-emerald-400 hover:text-emerald-700 active:bg-emerald-50 dark:bg-emerald-950 transition">
+              className="w-full py-2.5 rounded-xl border border-dashed border-gray-300 dark:border-zinc-600 text-gray-500 dark:text-zinc-500 text-xs font-medium flex items-center justify-center gap-1.5 hover:border-emerald-400 hover:text-emerald-700 active:bg-emerald-50 dark:active:bg-emerald-950 transition">
               <Icon.Plus size={14} strokeWidth={3} /> Spontane Übung hinzufügen
             </button>
           </div>
@@ -2239,7 +2239,7 @@ Nutze die Vergleichsdaten aktiv für konkrete Aussagen wie "+12% Volumen beim Ba
                   onChange={(e) => setNameDraft(e.target.value)}
                   onKeyDown={(e) => { if (e.key === 'Enter') saveExerciseName(); }}
                   autoFocus
-                  className="mt-5 w-full bg-white dark:bg-zinc-900 border border-gray-300 focus:border-emerald-400 rounded-xl px-4 py-3 text-gray-900 dark:text-zinc-50 text-lg outline-none font-medium"
+                  className="mt-5 w-full bg-white dark:bg-zinc-900 border border-gray-300 dark:border-zinc-600 focus:border-emerald-400 rounded-xl px-4 py-3 text-gray-900 dark:text-zinc-50 text-lg outline-none font-medium"
                   placeholder="z.B. Hackenschmidt"
                 />
                 <div className="mt-5 flex gap-2">
@@ -2340,7 +2340,7 @@ Nutze die Vergleichsdaten aktiv für konkrete Aussagen wie "+12% Volumen beim Ba
                       const alreadyIn = aw.exercises.some(e => e.name === ex.name);
                       return (
                         <button key={ex.name} onClick={() => addExercise(ex)}
-                          className="w-full text-left p-3 rounded-xl border bg-white dark:bg-zinc-900 border-gray-200 dark:border-zinc-700 active:bg-emerald-50 dark:bg-emerald-950 active:border-emerald-300 flex items-center gap-3 transition">
+                          className="w-full text-left p-3 rounded-xl border bg-white dark:bg-zinc-900 border-gray-200 dark:border-zinc-700 active:bg-emerald-50 dark:active:bg-emerald-950 active:border-emerald-300 flex items-center gap-3 transition">
                           <div className="flex-1 min-w-0">
                             <div className="font-medium text-gray-900 dark:text-zinc-50 text-sm flex items-center gap-2">
                               {ex.name}
@@ -2508,7 +2508,7 @@ Nutze die Vergleichsdaten aktiv für konkrete Aussagen wie "+12% Volumen beim Ba
       return (
         <div className="min-h-screen pb-28 relative grain">
           <div className="px-5 pt-6 pb-2 flex items-center gap-3">
-            <button onClick={() => setView('dashboard')} className="text-gray-500 dark:text-zinc-500 hover:text-gray-900 dark:text-zinc-50">
+            <button onClick={() => setView('dashboard')} className="text-gray-500 dark:text-zinc-500 hover:text-gray-900 dark:hover:text-zinc-50">
               <Icon.ChevronLeft size={28} />
             </button>
             <div>
@@ -2614,19 +2614,19 @@ Nutze die Vergleichsdaten aktiv für konkrete Aussagen wie "+12% Volumen beim Ba
                 </div>
                 <div className="flex items-center gap-2 mb-5">
                   <button onClick={() => setEditDuration({ ...editDuration, value: String(Math.max(1, parseInt(editDuration.value || 0, 10) - 1)) })}
-                    className="w-12 h-12 rounded-xl bg-gray-100 dark:bg-zinc-700 flex items-center justify-center text-gray-700 dark:text-zinc-300 active:bg-gray-200 text-xl font-bold">−</button>
+                    className="w-12 h-12 rounded-xl bg-gray-100 dark:bg-zinc-700 flex items-center justify-center text-gray-700 dark:text-zinc-300 active:bg-gray-200 dark:active:bg-zinc-700 text-xl font-bold">−</button>
                   <input type="number" inputMode="numeric" value={editDuration.value}
                     onChange={e => setEditDuration({ ...editDuration, value: e.target.value })}
                     className="flex-1 text-center font-mono-num text-4xl font-bold text-gray-900 dark:text-zinc-50 bg-gray-50 dark:bg-zinc-800 border border-gray-200 dark:border-zinc-700 rounded-2xl py-4 outline-none focus:border-emerald-400"
                     autoFocus />
                   <button onClick={() => setEditDuration({ ...editDuration, value: String((parseInt(editDuration.value || 0, 10) || 0) + 1) })}
-                    className="w-12 h-12 rounded-xl bg-gray-100 dark:bg-zinc-700 flex items-center justify-center text-gray-700 dark:text-zinc-300 active:bg-gray-200 text-xl font-bold">+</button>
+                    className="w-12 h-12 rounded-xl bg-gray-100 dark:bg-zinc-700 flex items-center justify-center text-gray-700 dark:text-zinc-300 active:bg-gray-200 dark:active:bg-zinc-700 text-xl font-bold">+</button>
                 </div>
                 <div className="text-center text-xs text-gray-400 dark:text-zinc-500 mb-4">min · Korrektur der Trainingszeit</div>
                 <div className="flex gap-2">
                   <button onClick={() => setEditDuration(null)} className="flex-1 py-3 rounded-xl bg-gray-100 dark:bg-zinc-700 text-gray-700 dark:text-zinc-300 font-medium">Abbrechen</button>
                   <button onClick={saveDuration} disabled={!editDuration.value || parseInt(editDuration.value, 10) < 1}
-                    className="flex-1 py-3 rounded-xl bg-emerald-500 disabled:bg-gray-200 text-white disabled:text-gray-400 dark:text-zinc-500 font-bold">Speichern</button>
+                    className="flex-1 py-3 rounded-xl bg-emerald-500 disabled:bg-gray-200 dark:bg-zinc-700 text-white disabled:text-gray-400 dark:text-zinc-500 font-bold">Speichern</button>
                 </div>
               </div>
             </div>
@@ -2741,7 +2741,7 @@ Nutze die Vergleichsdaten aktiv für konkrete Aussagen wie "+12% Volumen beim Ba
                   <div className="flex gap-2">
                     <button onClick={() => setEditSetModal(null)} className="flex-1 py-3 rounded-xl bg-gray-100 dark:bg-zinc-700 text-gray-700 dark:text-zinc-300 font-medium">Abbrechen</button>
                     <button onClick={saveSetEdit} disabled={editSetModal.reps === 0}
-                      className="flex-1 py-3 rounded-xl bg-emerald-500 disabled:bg-gray-200 text-white disabled:text-gray-400 dark:text-zinc-500 font-bold">Speichern</button>
+                      className="flex-1 py-3 rounded-xl bg-emerald-500 disabled:bg-gray-200 dark:bg-zinc-700 text-white disabled:text-gray-400 dark:text-zinc-500 font-bold">Speichern</button>
                   </div>
                 </div>
               </div>
@@ -2803,7 +2803,7 @@ Nutze die Vergleichsdaten aktiv für konkrete Aussagen wie "+12% Volumen beim Ba
         return (
           <div className="min-h-screen pb-28 relative grain">
             <div className="px-5 pt-6 pb-2 flex items-center gap-3">
-              <button onClick={() => setView('dashboard')} className="text-gray-500 dark:text-zinc-500 hover:text-gray-900 dark:text-zinc-50">
+              <button onClick={() => setView('dashboard')} className="text-gray-500 dark:text-zinc-500 hover:text-gray-900 dark:hover:text-zinc-50">
                 <Icon.ChevronLeft size={28} />
               </button>
               <div>
@@ -2812,7 +2812,7 @@ Nutze die Vergleichsdaten aktiv für konkrete Aussagen wie "+12% Volumen beim Ba
               </div>
             </div>
             <div className="mt-20 px-8 text-center">
-              <Icon.BarChart3 size={56} className="text-gray-300 mx-auto" strokeWidth={1.5} />
+              <Icon.BarChart3 size={56} className="text-gray-300 dark:text-zinc-600 mx-auto" strokeWidth={1.5} />
               <div className="font-display text-2xl text-gray-700 dark:text-zinc-300 mt-4">NOCH KEINE DATEN</div>
               <div className="text-sm text-gray-500 dark:text-zinc-500 mt-2">Absolviere dein erstes Workout, um deinen Fortschritt zu sehen.</div>
             </div>
@@ -2860,7 +2860,7 @@ Nutze die Vergleichsdaten aktiv für konkrete Aussagen wie "+12% Volumen beim Ba
       return (
         <div className="min-h-screen pb-28 relative grain">
           <div className="px-5 pt-6 pb-2 flex items-center gap-3">
-            <button onClick={() => setView('dashboard')} className="text-gray-500 dark:text-zinc-500 hover:text-gray-900 dark:text-zinc-50">
+            <button onClick={() => setView('dashboard')} className="text-gray-500 dark:text-zinc-500 hover:text-gray-900 dark:hover:text-zinc-50">
               <Icon.ChevronLeft size={28} />
             </button>
             <div>
@@ -3004,7 +3004,7 @@ Nutze die Vergleichsdaten aktiv für konkrete Aussagen wie "+12% Volumen beim Ba
             </div>
             {Object.keys(state.goals || {}).length === 0 ? (
               <div className="rounded-2xl bg-gray-50 dark:bg-zinc-800 border border-gray-200 dark:border-zinc-700 p-6 text-center">
-                <Icon.Trophy size={32} className="text-gray-300 mx-auto mb-2" strokeWidth={1.5} />
+                <Icon.Trophy size={32} className="text-gray-300 dark:text-zinc-600 mx-auto mb-2" strokeWidth={1.5} />
                 <div className="text-sm text-gray-500 dark:text-zinc-500">Noch keine Ziele. Tippe „+ Neues Ziel" um eine Wette oder Challenge zu verfolgen.</div>
               </div>
             ) : (
@@ -3015,7 +3015,7 @@ Nutze die Vergleichsdaten aktiv für konkrete Aussagen wie "+12% Volumen beim Ba
                   const prediction = predictRepsAtDate(name, workouts, goal.targetDate);
                   const onTrack = prediction ? prediction >= goal.target : null;
                   return (
-                    <button key={name} onClick={() => openGoalEditor(name, goal.current, goal.target, goal.targetDate)} className="w-full text-left rounded-2xl bg-white dark:bg-zinc-900 border border-gray-200 dark:border-zinc-700 p-4 active:bg-gray-50 dark:bg-zinc-800 transition">
+                    <button key={name} onClick={() => openGoalEditor(name, goal.current, goal.target, goal.targetDate)} className="w-full text-left rounded-2xl bg-white dark:bg-zinc-900 border border-gray-200 dark:border-zinc-700 p-4 active:bg-gray-50 dark:active:bg-zinc-800 transition">
                       <div className="flex items-baseline justify-between mb-2">
                         <div className="font-semibold text-gray-900 dark:text-zinc-50">{name}</div>
                         <div className="font-mono-num text-sm font-bold text-emerald-700">{goal.current} / {goal.target}</div>
@@ -3189,7 +3189,7 @@ Nutze die Vergleichsdaten aktiv für konkrete Aussagen wie "+12% Volumen beim Ba
                           <div className="w-2.5 h-2.5 rounded-full flex-shrink-0" style={{ background: s.color }} />
                           <div className="flex-1 min-w-0">
                             <div className="text-xs font-medium text-gray-800 dark:text-zinc-100 truncate">{s.group}</div>
-                            <div className="w-full bg-gray-200 rounded-full h-1 mt-0.5">
+                            <div className="w-full bg-gray-200 dark:bg-zinc-700 rounded-full h-1 mt-0.5">
                               <div className="h-1 rounded-full" style={{ width: `${s.frac * 100}%`, background: s.color }} />
                             </div>
                           </div>
@@ -3223,7 +3223,7 @@ Nutze die Vergleichsdaten aktiv für konkrete Aussagen wie "+12% Volumen beim Ba
                 const maxCount = exStats[exNames[0]].count;
                 const widthPct = (s.count / maxCount) * 100;
                 return (
-                  <button key={name} onClick={() => setSelectedEx(name)} className="w-full p-3 text-left relative overflow-hidden active:bg-gray-100 dark:bg-zinc-700/70">
+                  <button key={name} onClick={() => setSelectedEx(name)} className="w-full p-3 text-left relative overflow-hidden active:bg-gray-100 dark:active:bg-zinc-700/70">
                     <div className="absolute inset-y-0 left-0 bg-emerald-100/5" style={{ width: `${widthPct}%` }}></div>
                     <div className="relative flex items-center gap-3">
                       <div className="font-display text-xl text-gray-400 dark:text-zinc-500 w-6">{i + 1}</div>
@@ -3249,7 +3249,7 @@ Nutze die Vergleichsdaten aktiv für konkrete Aussagen wie "+12% Volumen beim Ba
               <div className="bg-white dark:bg-zinc-900 w-full rounded-t-3xl p-6 max-h-[85vh] overflow-y-auto" style={{ paddingTop: 'max(24px, env(safe-area-inset-top))' }}>
                 <div className="flex items-center justify-between mb-4">
                   <div className="font-display text-2xl text-gray-900 dark:text-zinc-50">Ziel</div>
-                  <button onClick={() => setEditorGoal(null)} className="text-gray-500 dark:text-zinc-500 hover:text-gray-900 dark:text-zinc-50"><Icon.X size={22} /></button>
+                  <button onClick={() => setEditorGoal(null)} className="text-gray-500 dark:text-zinc-500 hover:text-gray-900 dark:hover:text-zinc-50"><Icon.X size={22} /></button>
                 </div>
                 <div className="space-y-3 mb-5">
                   <div>
@@ -3343,7 +3343,7 @@ Nutze die Vergleichsdaten aktiv für konkrete Aussagen wie "+12% Volumen beim Ba
       return (
         <div className={`relative grain ${postWorkout ? '' : 'min-h-screen pb-28'}`}>
           <div className={`px-5 pt-6 pb-2 flex items-center gap-3 ${postWorkout ? 'pt-4' : ''}`}>
-            <button onClick={() => setView(postWorkout ? 'history' : 'stats')} className="text-gray-500 dark:text-zinc-500 hover:text-gray-900 dark:text-zinc-50">
+            <button onClick={() => setView(postWorkout ? 'history' : 'stats')} className="text-gray-500 dark:text-zinc-500 hover:text-gray-900 dark:hover:text-zinc-50">
               <Icon.ChevronLeft size={28} />
             </button>
             <div>
@@ -3354,7 +3354,7 @@ Nutze die Vergleichsdaten aktiv für konkrete Aussagen wie "+12% Volumen beim Ba
 
           {insights.length === 0 && (
             <div className="mt-20 px-8 text-center">
-              <Icon.Activity size={56} className="text-gray-300 mx-auto" strokeWidth={1.5} />
+              <Icon.Activity size={56} className="text-gray-300 dark:text-zinc-600 mx-auto" strokeWidth={1.5} />
               <div className="font-display text-2xl text-gray-700 dark:text-zinc-300 mt-4">NOCH KEINE DATEN</div>
               <div className="text-sm text-gray-500 dark:text-zinc-500 mt-2">Mindestens 3–4 Workouts nötig für aussagekräftige Erkenntnisse.</div>
             </div>
@@ -3449,8 +3449,8 @@ Nutze die Vergleichsdaten aktiv für konkrete Aussagen wie "+12% Volumen beim Ba
       return (
         <div className="fixed inset-0 bg-white dark:bg-zinc-900 z-50 overflow-y-auto" style={{ paddingTop: 'env(safe-area-inset-top)', paddingBottom: 'env(safe-area-inset-bottom)' }}>
           {/* Header */}
-          <div className="sticky top-0 z-10 bg-white/90 backdrop-blur border-b border-gray-200 dark:border-zinc-700 px-4 py-3 flex items-center justify-between">
-            <button onClick={onClose} className="text-gray-600 dark:text-zinc-400 hover:text-gray-900 dark:text-zinc-50 p-1">
+          <div className="sticky top-0 z-10 bg-white/90 dark:bg-zinc-900/90 backdrop-blur border-b border-gray-200 dark:border-zinc-700 px-4 py-3 flex items-center justify-between">
+            <button onClick={onClose} className="text-gray-600 dark:text-zinc-400 hover:text-gray-900 dark:hover:text-zinc-50 p-1">
               <Icon.X size={22} />
             </button>
             <div className="text-center">
@@ -3514,13 +3514,13 @@ Nutze die Vergleichsdaten aktiv für konkrete Aussagen wie "+12% Volumen beim Ba
                       <div>
                         <div className="text-[10px] uppercase tracking-wider text-gray-500 dark:text-zinc-500 mb-1">Name</div>
                         <input type="text" value={ex.name} onChange={(e) => updateEx(i, { name: e.target.value })}
-                          className="w-full bg-white dark:bg-zinc-900 border border-gray-300 focus:border-emerald-400 rounded-xl px-3 py-2.5 text-gray-900 dark:text-zinc-50 outline-none" />
+                          className="w-full bg-white dark:bg-zinc-900 border border-gray-300 dark:border-zinc-600 focus:border-emerald-400 rounded-xl px-3 py-2.5 text-gray-900 dark:text-zinc-50 outline-none" />
                       </div>
                       <div>
                         <div className="text-[10px] uppercase tracking-wider text-gray-500 dark:text-zinc-500 mb-1">Fokus (optional)</div>
                         <input type="text" value={ex.focus || ''} onChange={(e) => updateEx(i, { focus: e.target.value })}
                           placeholder="z.B. Brust / Trizeps"
-                          className="w-full bg-white dark:bg-zinc-900 border border-gray-300 focus:border-emerald-400 rounded-xl px-3 py-2.5 text-gray-900 dark:text-zinc-50 outline-none text-sm" />
+                          className="w-full bg-white dark:bg-zinc-900 border border-gray-300 dark:border-zinc-600 focus:border-emerald-400 rounded-xl px-3 py-2.5 text-gray-900 dark:text-zinc-50 outline-none text-sm" />
                       </div>
                       <div className="flex items-center gap-2">
                         <button onClick={() => updateEx(i, { cardio: !ex.cardio })}
@@ -3549,7 +3549,7 @@ Nutze die Vergleichsdaten aktiv für konkrete Aussagen wie "+12% Volumen beim Ba
               );
             })}
 
-            <button onClick={addEx} className="w-full p-4 rounded-2xl border-2 border-dashed border-gray-300 text-gray-600 dark:text-zinc-400 active:border-emerald-400 active:text-emerald-700 flex items-center justify-center gap-2 text-sm font-medium">
+            <button onClick={addEx} className="w-full p-4 rounded-2xl border-2 border-dashed border-gray-300 dark:border-zinc-600 text-gray-600 dark:text-zinc-400 active:border-emerald-400 active:text-emerald-700 flex items-center justify-center gap-2 text-sm font-medium">
               <Icon.Plus size={16} strokeWidth={3} /> Übung hinzufügen
             </button>
 
@@ -3665,7 +3665,7 @@ Nutze die Vergleichsdaten aktiv für konkrete Aussagen wie "+12% Volumen beim Ba
         <div className="fixed inset-0 bg-white dark:bg-zinc-900 z-50 overflow-hidden flex flex-col" style={{ paddingTop: 'env(safe-area-inset-top)', paddingBottom: 'env(safe-area-inset-bottom)' }}>
           {/* Header */}
           <div className="border-b border-gray-200 dark:border-zinc-700 px-4 py-3 flex items-center justify-between flex-shrink-0">
-            <button onClick={onClose} className="text-gray-400 dark:text-zinc-500 hover:text-gray-900 dark:text-zinc-50 p-1"><Icon.X size={22} /></button>
+            <button onClick={onClose} className="text-gray-400 dark:text-zinc-500 hover:text-gray-900 dark:hover:text-zinc-50 p-1"><Icon.X size={22} /></button>
             <div className="text-center">
               <div className="text-[10px] uppercase tracking-[0.3em] text-gray-500 dark:text-zinc-500">{isNew ? 'Neuer Plan' : 'Plan bearbeiten'}</div>
               <div className="font-display text-xl text-gray-900 dark:text-zinc-50 leading-none mt-0.5">{planName || '...'}</div>
@@ -3726,7 +3726,7 @@ Nutze die Vergleichsdaten aktiv für konkrete Aussagen wie "+12% Volumen beim Ba
               {/* Exercise list for this day */}
               <div className="space-y-2">
                 {days[activeDayIdx].exercises.length === 0 && (
-                  <div className="text-center text-gray-400 dark:text-zinc-500 text-sm py-6 rounded-2xl bg-gray-50 dark:bg-zinc-800 border border-dashed border-gray-300">
+                  <div className="text-center text-gray-400 dark:text-zinc-500 text-sm py-6 rounded-2xl bg-gray-50 dark:bg-zinc-800 border border-dashed border-gray-300 dark:border-zinc-600">
                     Keine Übungen — füge welche aus der Bibliothek hinzu.
                   </div>
                 )}
@@ -3776,11 +3776,11 @@ Nutze die Vergleichsdaten aktiv für konkrete Aussagen wie "+12% Volumen beim Ba
               {/* Add buttons */}
               <div className="flex gap-2 mt-3">
                 <button onClick={() => setShowLibrary(true)}
-                  className="flex-1 p-3 rounded-2xl border-2 border-dashed border-gray-300 text-gray-500 dark:text-zinc-500 hover:border-emerald-400 hover:text-emerald-700 flex items-center justify-center gap-1.5 text-sm font-medium transition">
+                  className="flex-1 p-3 rounded-2xl border-2 border-dashed border-gray-300 dark:border-zinc-600 text-gray-500 dark:text-zinc-500 hover:border-emerald-400 hover:text-emerald-700 flex items-center justify-center gap-1.5 text-sm font-medium transition">
                   <Icon.Dumbbell size={15} /> Aus Bibliothek
                 </button>
                 <button onClick={addCustomEx}
-                  className="flex-1 p-3 rounded-2xl border-2 border-dashed border-gray-300 text-gray-500 dark:text-zinc-500 hover:border-emerald-400 hover:text-emerald-700 flex items-center justify-center gap-1.5 text-sm font-medium transition">
+                  className="flex-1 p-3 rounded-2xl border-2 border-dashed border-gray-300 dark:border-zinc-600 text-gray-500 dark:text-zinc-500 hover:border-emerald-400 hover:text-emerald-700 flex items-center justify-center gap-1.5 text-sm font-medium transition">
                   <Icon.Plus size={15} strokeWidth={3} /> Eigene
                 </button>
               </div>
@@ -3919,7 +3919,7 @@ Nutze die Vergleichsdaten aktiv für konkrete Aussagen wie "+12% Volumen beim Ba
                 <div className={`w-2 h-2 rounded-full ${syncStatus === 'error' ? 'bg-red-400' : syncStatus === 'syncing' ? 'bg-amber-400' : 'bg-emerald-500'}`} />
                 <div className="text-sm font-semibold text-gray-900 dark:text-zinc-50">Verbunden</div>
               </div>
-              <button onClick={() => setEditing(true)} className="text-xs text-gray-500 dark:text-zinc-500 hover:text-gray-800 dark:text-zinc-100">
+              <button onClick={() => setEditing(true)} className="text-xs text-gray-500 dark:text-zinc-500 hover:text-gray-800 dark:hover:text-zinc-100">
                 <Icon.Edit3 size={14} />
               </button>
             </div>
@@ -3942,7 +3942,7 @@ Nutze die Vergleichsdaten aktiv für konkrete Aussagen wie "+12% Volumen beim Ba
       return (
         <div className="space-y-3">
           {isConfigured && (
-            <button onClick={() => setEditing(false)} className="text-xs text-gray-500 dark:text-zinc-500 hover:text-gray-800 dark:text-zinc-100 flex items-center gap-1">
+            <button onClick={() => setEditing(false)} className="text-xs text-gray-500 dark:text-zinc-500 hover:text-gray-800 dark:hover:text-zinc-100 flex items-center gap-1">
               <Icon.ChevronLeft size={12} /> Zurück
             </button>
           )}
@@ -4117,7 +4117,7 @@ with check (true);`}</pre>
       return (
         <div className="min-h-screen pb-28 relative grain">
           <div className="px-5 pt-6 pb-2 flex items-center gap-3">
-            <button onClick={() => setView('dashboard')} className="text-gray-500 dark:text-zinc-500 hover:text-gray-900 dark:text-zinc-50">
+            <button onClick={() => setView('dashboard')} className="text-gray-500 dark:text-zinc-500 hover:text-gray-900 dark:hover:text-zinc-50">
               <Icon.ChevronLeft size={28} />
             </button>
             <div>
@@ -4168,7 +4168,7 @@ with check (true);`}</pre>
                   </>
                 )}
                 {/* Create new plan */}
-                <button onClick={() => setPlanCreator('__new__')} className="w-full p-3 rounded-2xl border-2 border-dashed border-gray-300 text-gray-500 dark:text-zinc-500 hover:border-emerald-400 hover:text-emerald-700 flex items-center justify-center gap-2 text-sm font-medium transition mt-1">
+                <button onClick={() => setPlanCreator('__new__')} className="w-full p-3 rounded-2xl border-2 border-dashed border-gray-300 dark:border-zinc-600 text-gray-500 dark:text-zinc-500 hover:border-emerald-400 hover:text-emerald-700 flex items-center justify-center gap-2 text-sm font-medium transition mt-1">
                   <Icon.Plus size={16} strokeWidth={3} /> Eigenen Plan erstellen
                 </button>
               </div>
@@ -4202,12 +4202,12 @@ with check (true);`}</pre>
                 </div>
                 <button
                   onClick={() => persist({ ...state, deloadMode: !state.deloadMode })}
-                  className={`w-full p-4 rounded-2xl border transition flex items-center justify-between ${state.deloadMode ? 'bg-amber-50 border-amber-300 text-amber-900' : 'bg-gray-50 border-gray-200 text-gray-800'}`}>
+                  className={`w-full p-4 rounded-2xl border transition flex items-center justify-between ${state.deloadMode ? 'bg-amber-50 dark:bg-amber-950 border-amber-300 dark:border-amber-700 text-amber-900 dark:text-amber-200' : 'bg-gray-50 dark:bg-zinc-800 border-gray-200 dark:border-zinc-700 text-gray-800 dark:text-zinc-200'}`}>
                   <div>
                     <div className="font-semibold text-sm">Deload-Modus</div>
-                    <div className={`text-xs mt-0.5 ${state.deloadMode ? 'text-amber-800/70' : 'text-gray-500'}`}>-20% Gewicht · halbe XP</div>
+                    <div className={`text-xs mt-0.5 ${state.deloadMode ? 'text-amber-800/70 dark:text-amber-300/70' : 'text-gray-500 dark:text-zinc-400'}`}>-20% Gewicht · halbe XP</div>
                   </div>
-                  {state.deloadMode && <Icon.Check size={20} strokeWidth={3} className="text-amber-700" />}
+                  {state.deloadMode && <Icon.Check size={20} strokeWidth={3} className="text-amber-700 dark:text-amber-400" />}
                 </button>
               </div>
             </Section>
@@ -4223,7 +4223,7 @@ with check (true);`}</pre>
                   const isCustom = !!(state.customTemplates && state.customTemplates[key]);
                   return (
                     <button key={key} onClick={() => setEditorKey(key)}
-                      className="w-full text-left p-4 rounded-2xl border border-gray-200 dark:border-zinc-700 bg-gray-50 dark:bg-zinc-800 hover:bg-gray-100 dark:bg-zinc-700 transition flex items-center gap-3">
+                      className="w-full text-left p-4 rounded-2xl border border-gray-200 dark:border-zinc-700 bg-gray-50 dark:bg-zinc-800 hover:bg-gray-100 dark:hover:bg-zinc-700 transition flex items-center gap-3">
                       <div className="w-10 h-10 rounded-xl bg-gray-100 dark:bg-zinc-700 flex items-center justify-center font-display text-xl text-emerald-700">{tmpl.code}</div>
                       <div className="flex-1 min-w-0">
                         <div className="font-semibold text-gray-900 dark:text-zinc-50 flex items-center gap-2">
@@ -4284,7 +4284,7 @@ with check (true);`}</pre>
             </Section>
 
             <Section title="Daten">
-              <button onClick={exportData} className="w-full p-4 rounded-2xl border border-gray-300 bg-gray-50 dark:bg-zinc-800 text-gray-800 dark:text-zinc-100 text-sm font-medium flex items-center justify-center gap-2 mb-2">
+              <button onClick={exportData} className="w-full p-4 rounded-2xl border border-gray-300 dark:border-zinc-600 bg-gray-50 dark:bg-zinc-800 text-gray-800 dark:text-zinc-100 text-sm font-medium flex items-center justify-center gap-2 mb-2">
                 <Icon.Share size={16} /> Backup exportieren (JSON)
               </button>
               <input
@@ -4315,7 +4315,7 @@ with check (true);`}</pre>
                   reader.readAsText(file);
                 }}
               />
-              <button onClick={() => document.getElementById('importFile').click()} className="w-full p-4 rounded-2xl border border-gray-300 bg-gray-50 dark:bg-zinc-800 text-gray-800 dark:text-zinc-100 text-sm font-medium flex items-center justify-center gap-2 mb-2">
+              <button onClick={() => document.getElementById('importFile').click()} className="w-full p-4 rounded-2xl border border-gray-300 dark:border-zinc-600 bg-gray-50 dark:bg-zinc-800 text-gray-800 dark:text-zinc-100 text-sm font-medium flex items-center justify-center gap-2 mb-2">
                 <Icon.Download size={16} /> Backup importieren (JSON)
               </button>
               {hasBackup() && (
@@ -4336,7 +4336,7 @@ with check (true);`}</pre>
               <div className="text-[11px] text-gray-400 dark:text-zinc-500 mt-2 text-center">Lokal gespeichert · Offline-fähig</div>
             </Section>
 
-            <div className="text-center text-gray-300 text-[10px] pt-4">
+            <div className="text-center text-gray-300 dark:text-zinc-600 text-[10px] pt-4">
               IRONBLOCK · v1.0 · Hypertrophie &lt; 60 min
             </div>
           </div>
@@ -4535,11 +4535,11 @@ with check (true);`}</pre>
                     </div>
                   </div>
                   <div className="flex flex-wrap gap-2 mt-3">
-                    <span className="text-xs font-medium bg-white/60 rounded-xl px-2.5 py-1">⏱ {a.durationMin} min</span>
-                    {a.km   != null && <span className="text-xs font-medium bg-white/60 rounded-xl px-2.5 py-1">📍 {a.km} km</span>}
-                    {p      != null && <span className="text-xs font-medium bg-white/60 rounded-xl px-2.5 py-1">⚡ {p}</span>}
-                    {a.bpm  != null && <span className="text-xs font-medium bg-white/60 rounded-xl px-2.5 py-1">❤️ {a.bpm} bpm</span>}
-                    {a.kcal != null && <span className="text-xs font-medium bg-white/60 rounded-xl px-2.5 py-1">🔥 {a.kcal} kcal</span>}
+                    <span className="text-xs font-medium bg-white/60 dark:bg-zinc-800/60 rounded-xl px-2.5 py-1">⏱ {a.durationMin} min</span>
+                    {a.km   != null && <span className="text-xs font-medium bg-white/60 dark:bg-zinc-800/60 rounded-xl px-2.5 py-1">📍 {a.km} km</span>}
+                    {p      != null && <span className="text-xs font-medium bg-white/60 dark:bg-zinc-800/60 rounded-xl px-2.5 py-1">⚡ {p}</span>}
+                    {a.bpm  != null && <span className="text-xs font-medium bg-white/60 dark:bg-zinc-800/60 rounded-xl px-2.5 py-1">❤️ {a.bpm} bpm</span>}
+                    {a.kcal != null && <span className="text-xs font-medium bg-white/60 dark:bg-zinc-800/60 rounded-xl px-2.5 py-1">🔥 {a.kcal} kcal</span>}
                   </div>
                   {a.note && (
                     <div className="mt-2 text-xs opacity-80 italic leading-relaxed">"{a.note}"</div>
